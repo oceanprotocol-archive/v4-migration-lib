@@ -1,0 +1,19 @@
+{
+  "name": "v4-migration-lib",
+  "version": "0.0.0",
+  "description": "V4 Migration Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanprotocol/v4-migration-lib.git"
+  },
+  "author": "Ocean Protocol Foundation",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/oceanprotocol/v4-migration-lib/issues"
+  },
+  "homepage": "https://github.com/oceanprotocol/v4-migration-lib#readme"
+}
