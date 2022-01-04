@@ -1,7 +1,7 @@
 import { DDO, DID, Logger } from '@oceanprotocol/lib'
 import axios, { AxiosResponse } from 'axios'
 
-export default async function getDDO(did: string | DID): Promise<DDO> {
+export async function getDDO(did: string | DID): Promise<DDO> {
   try {
     const metadataCacheUri = process.env.METADATACACHE_URI
     const response: AxiosResponse<DDO> = await axios.get(

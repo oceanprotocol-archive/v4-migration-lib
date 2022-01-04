@@ -1,19 +1,9 @@
 import { DDO as v3DDO } from '@oceanprotocol/lib'
 import { DDO as v4DDO } from '../@types/DDO/DDO'
-import getDDO from './importDDO'
+import { getDDO } from './importDDO'
 
-export default async function convertDDO(did: string): Promise<v4DDO> {
-  const v3DDO: v3DDO = await getDDO(did)
-  // console.log('v3DDO', v3DDO)
-
+export async function convertDDO(did: string, v3DDO: v3DDO): Promise<v4DDO> {
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
-
-  let serviceType: 'dataset' | 'algorithm'
-  //   if (v3DDO.service[1].type === 'access') {
-  //     serviceType = 'dataset'
-  //   } else if (v3DDO.service[0].type === 'algorithm') {
-  //     serviceType = 'algorithm'
-  //   }
 
   const v4DDO: v4DDO = {
     '@context': ['https://w3id.org/did/v1'],
@@ -48,6 +38,14 @@ export default async function convertDDO(did: string): Promise<v4DDO> {
       }
     ]
   }
+
+  return v4DDO
+}
+
+export async function getAndConvertDDO(did: string): Promise<v4DDO> {
+  const v3DDO: v3DDO = await getDDO(did)
+
+  const v4DDO: v4DDO = await convertDDO(did, v3DDO)
 
   return v4DDO
 }
