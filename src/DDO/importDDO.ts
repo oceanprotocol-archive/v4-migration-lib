@@ -4,7 +4,6 @@ import axios, { AxiosResponse } from 'axios'
 export default async function getDDO(did: string | DID): Promise<DDO> {
   try {
     const metadataCacheUri = process.env.METADATACACHE_URI
-    console.log('metadataCacheUri', metadataCacheUri)
     const response: AxiosResponse<DDO> = await axios.get(
       `${metadataCacheUri}/api/v1/aquarius/assets/ddo/${did}`
     )

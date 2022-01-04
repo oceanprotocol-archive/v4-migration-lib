@@ -4,8 +4,16 @@ import getDDO from './importDDO'
 
 export default async function convertDDO(did: string): Promise<v4DDO> {
   const v3DDO: v3DDO = await getDDO(did)
+  // console.log('v3DDO', v3DDO)
 
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
+
+  let serviceType: 'dataset' | 'algorithm'
+  //   if (v3DDO.service[1].type === 'access') {
+  //     serviceType = 'dataset'
+  //   } else if (v3DDO.service[0].type === 'algorithm') {
+  //     serviceType = 'algorithm'
+  //   }
 
   const v4DDO: v4DDO = {
     '@context': ['https://w3id.org/did/v1'],
@@ -32,7 +40,7 @@ export default async function convertDDO(did: string): Promise<v4DDO> {
     services: [
       {
         id: did,
-        type: v3DDO.service[1].type,
+        type: v3DDO.service[0].attributes.main.type,
         files: '',
         datatokenAddress: v3DDO.dataTokenInfo.address,
         serviceEndpoint: v3DDO.service[1].serviceEndpoint,
