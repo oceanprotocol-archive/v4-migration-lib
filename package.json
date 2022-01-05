@@ -1,0 +1,75 @@
+{
+  "name": "v4-migration-lib",
+  "version": "0.0.0",
+  "description": "V4 Migration Library",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "build": "npm run clean && tsc --sourcemap",
+    "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx . && npm run type-check",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write",
+    "clean": "rm -rf ./dist",
+    "prepare": "husky install",
+    "test": "npm run lint && npm run test:unit:cover && npm run test:integration:cover",
+    "test:unit": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/**/*.test.ts'",
+    "test:unit:cover": "nyc --report-dir coverage/unit npm run test:unit",
+    "test:integration": "mocha --config=test/integration/.mocharc.json --node-env=test --exit 'test/integration/**/*.test.ts'",
+    "test:integration:cover": "nyc --report-dir coverage/integration --no-clean npm run test:integration"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanprotocol/v4-migration-lib.git"
+  },
+  "author": "Ocean Protocol Foundation",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/oceanprotocol/v4-migration-lib/issues"
+  },
+  "homepage": "https://github.com/oceanprotocol/v4-migration-lib#readme",
+  "dependencies": {
+    "@oceanprotocol/lib": "^0.20.1",
+    "axios": "^0.20.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.2",
+    "@babel/eslint-parser": "^7.14.2",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/chai": "^4.2.19",
+    "@types/express": "^4.17.11",
+    "@types/mocha": "^9.0.0",
+    "@types/node": "^14.14.37",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "chai": "^4.3.4",
+    "eslint": "^7.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^6.0.0",
+    "mocha": "^9.1.3",
+    "mock-local-storage": "^1.1.17",
+    "prettier": "^2.3.0",
+    "pretty-quick": "^3.1.0",
+    "ts-node": "^10.0.0",
+    "ts-node-register": "^1.0.0",
+    "typescript": "3.9.2"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  }
+}
