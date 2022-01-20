@@ -1,14 +1,14 @@
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
-import defaultMigrationAbi from './defaultMigrationABI.json'
+import { abi } from './../artifacts/V4Migration.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 
 /**
  * Pool Info
  */
-interface PoolStatus {
+export interface PoolStatus {
   migrationStatus: number
   poolV3Address: string
   poolV4Address: string
@@ -27,7 +27,7 @@ interface PoolStatus {
 /**
  * Tokens Details
  */
-interface TokensDetails {
+export interface TokensDetails {
   erc721Address: string
   dtV4Address: string
   nftName: string
@@ -40,7 +40,7 @@ interface TokensDetails {
 /**
  * User's shares allocation
  */
-interface ShareAllocation {
+export interface ShareAllocation {
   userV3Shares: string
   userV4Shares: string
   alreadyAdded: boolean
@@ -54,8 +54,12 @@ export class Migration {
   public web3: Web3
   public startBlock: number
 
-  constructor(web3: Web3, nftAbi?: AbiItem | AbiItem[], startBlock?: number) {
-    this.migrationAbi = this.migrationAbi || (defaultMigrationAbi as AbiItem[])
+  constructor(
+    web3: Web3,
+    migrationAbi?: AbiItem | AbiItem[],
+    startBlock?: number
+  ) {
+    this.migrationAbi = migrationAbi || (abi as AbiItem[])
     this.web3 = web3
     this.startBlock = startBlock || 0
   }
