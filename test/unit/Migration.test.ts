@@ -47,7 +47,7 @@ describe('Migration test', () => {
     oceanDAO = contracts.accounts[0]
 
     await contracts.deployContracts(oceanDAO, Router.abi as AbiItem[])
-    console.log(contracts)
+    //console.log(contracts)
   })
 
   it('should initiate Migration instance', async () => {

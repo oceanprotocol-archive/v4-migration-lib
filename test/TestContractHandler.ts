@@ -65,8 +65,8 @@ export class TestContractHandler {
   public v3DTFactoryAddress: string
   public v3BPoolTemplateAddress: string
   public v3DatatokenTemplateAddress: string
-  public v3dt1Address: string | void
-  public v3dt2Address: string | void
+  public v3dt1Address: string
+  public v3dt2Address: string
   public v3pool1Address: string
   public v3pool2Address: string
   public web3: Web3
@@ -147,7 +147,7 @@ export class TestContractHandler {
     // DEPLOY V3 CONTRACTS, DT template , DT Factory, BPool and BFactory
     const name = 'Template'
     const symbol = 'TEMPL'
-    const cap = this.web3.utils.toWei('10000')
+    const cap = this.web3.utils.toWei('100000')
     const minter = owner
     const blob = 'https://example.com/dataset-1'
 
@@ -610,24 +610,14 @@ export class TestContractHandler {
     let trxReceipt
     // CREATE V3 datatoken1
     trxReceipt = await V3DtFactory.methods
-      .createToken(
-        'https://dataset1.dao',
-        'Token1',
-        'Tk1',
-        this.web3.utils.toWei('10000')
-      )
+      .createToken('https://dataset1.dao', 'Token1', 'Tk1', cap)
       .send({ from: owner })
 
     this.v3dt1Address =
       trxReceipt.events.TokenCreated.returnValues.newTokenAddress
 
     trxReceipt = await V3DtFactory.methods
-      .createToken(
-        'https://dataset2.dao',
-        'Token2',
-        'Tk2',
-        this.web3.utils.toWei('10000')
-      )
+      .createToken('https://dataset2.dao', 'Token2', 'Tk2', cap)
       .send({ from: owner })
 
     this.v3dt2Address =
@@ -652,6 +642,70 @@ export class TestContractHandler {
       V3BPoolTemplate.abi as AbiItem[],
       this.v3pool2Address
     )
+    // APPROVE OCEAN and v3 DTs in both Pools
+    const OceanMock = new this.web3.eth.Contract(
+      MockERC20.abi as AbiItem[],
+      this.oceanAddress
+    )
+
+    const Dt1Mock = new this.web3.eth.Contract(
+      V3DatatokenTemplate.abi as AbiItem[],
+      this.v3dt1Address
+    )
+    const Dt2Mock = new this.web3.eth.Contract(
+      V3DatatokenTemplate.abi as AbiItem[],
+      this.v3dt2Address
+    )
+
+    await Dt1Mock.methods.mint(owner, cap).send({ from: owner })
+    await Dt2Mock.methods.mint(owner, cap).send({ from: owner })
+
+    const MAX = this.web3.utils.toTwosComplement(-1)
+
+    await OceanMock.methods
+      .approve(this.v3pool1Address, MAX)
+      .send({ from: owner })
+
+    await Dt1Mock.methods
+      .approve(this.v3pool1Address, MAX)
+      .send({ from: owner })
+
+    await OceanMock.methods
+      .approve(this.v3pool2Address, MAX)
+      .send({ from: owner })
+
+    await Dt2Mock.methods
+      .approve(this.v3pool2Address, MAX)
+      .send({ from: owner })
+
+    // SETUP INITIAL POOLS
+
+    await V3Pool1.methods
+      .setup(
+        this.v3dt1Address,
+        this.web3.utils.toWei('10000'),
+        this.web3.utils.toWei('25'),
+        this.oceanAddress,
+        this.web3.utils.toWei('10000'),
+        this.web3.utils.toWei('25'),
+        1e15
+      )
+      .send({ from: owner })
+
+    await V3Pool2.methods
+      .setup(
+        this.v3dt2Address,
+        this.web3.utils.toWei('10000'),
+        this.web3.utils.toWei('25'),
+        this.oceanAddress,
+        this.web3.utils.toWei('20000'),
+        this.web3.utils.toWei('25'),
+        1e15
+      )
+      .send({ from: owner })
+
+    console.log(await V3Pool1.methods.isFinalized().call())
+    console.log(await V3Pool2.methods.isFinalized().call())
 
     await RouterContract.methods
       .addFactory(this.factory721Address)
