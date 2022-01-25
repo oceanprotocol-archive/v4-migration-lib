@@ -4,6 +4,10 @@ import { AbiItem } from 'web3-utils/types'
 import MockERC20 from '@oceanprotocol/contracts/artifacts/contracts/utils/mock/MockERC20Decimals.sol/MockERC20Decimals.json'
 import V4Migration from './../src/artifacts/V4Migration.json'
 import MigrationStaking from './../src/artifacts/MigrationStaking.json'
+import V3BFactory from './../src/artifacts/V3BFactory.json'
+import V3DTFactory from './../src/artifacts/V3DTFactory.json'
+import V3BPoolTemplate from './../src/artifacts/V3BPool.json'
+import V3DatatokenTemplate from './../src/artifacts/V3DataTokenTemplate.json'
 
 export class TestContractHandler {
   public accounts: string[]
@@ -20,6 +24,10 @@ export class TestContractHandler {
   public MockOcean: Contract
   public Migration: Contract
   public MigrationStaking: Contract
+  public V3BFactory: Contract
+  public V3DTFactory: Contract
+  public V3BPoolTemplate: Contract
+  public V3DatatokenTemplate: Contract
 
   public ERC721FactoryBytecode: string
   public ERC20TemplateBytecode: string
@@ -34,6 +42,10 @@ export class TestContractHandler {
   public OPFBytecode: string
   public MigrationBytecode: string
   public MigrationStakingBytecode: string
+  public V3BFactoryBytecode: string
+  public V3DTFactoryBytecode: string
+  public V3BPoolTemplateBytecode: string
+  public V3DatatokenTemplateBytecode: string
 
   public factory721Address: string
   public template721Address: string
@@ -49,6 +61,10 @@ export class TestContractHandler {
   public usdcAddress: string
   public migrationAddress: string
   public migrationStakingAddress: string
+  public v3BFactoryAddress: string
+  public v3DTFactoryAddress: string
+  public v3BPoolTemplateAddress: string
+  public v3DatatokenTemplateAddress: string
   public web3: Web3
 
   constructor(
@@ -90,6 +106,14 @@ export class TestContractHandler {
     this.MigrationStaking = new this.web3.eth.Contract(
       MigrationStaking.abi as AbiItem[]
     )
+    this.V3BFactory = new this.web3.eth.Contract(V3BFactory.abi as AbiItem[])
+    this.V3DTFactory = new this.web3.eth.Contract(V3DTFactory.abi as AbiItem[])
+    this.V3BPoolTemplate = new this.web3.eth.Contract(
+      V3BPoolTemplate.abi as AbiItem[]
+    )
+    this.V3DatatokenTemplate = new this.web3.eth.Contract(
+      V3DatatokenTemplate.abi as AbiItem[]
+    )
 
     this.ERC721FactoryBytecode = factory721Bytecode
     this.ERC20TemplateBytecode = template20Bytecode
@@ -103,6 +127,10 @@ export class TestContractHandler {
     this.OPFBytecode = opfBytecode
     this.MigrationBytecode = V4Migration.bytecode
     this.MigrationStakingBytecode = MigrationStaking.bytecode
+    this.V3BFactoryBytecode = V3BFactory.bytecode
+    this.V3DTFactoryBytecode = V3DTFactory.bytecode
+    this.V3BPoolTemplateBytecode = V3BPoolTemplate.bytecode
+    this.V3DatatokenTemplateBytecode = V3DatatokenTemplate.bytecode
   }
 
   public async getAccounts(): Promise<string[]> {
@@ -112,6 +140,100 @@ export class TestContractHandler {
 
   public async deployContracts(owner: string, routerABI?: AbiItem | AbiItem[]) {
     let estGas
+    // DEPLOY V3 CONTRACTS, DT template , DT Factory, BPool and BFactory
+    const name = 'Template'
+    const symbol = 'TEMPL'
+    const cap = this.web3.utils.toWei('10000')
+    const minter = owner
+    const blob = 'https://example.com/dataset-1'
+
+    // v3 Datatoken Template
+    estGas = await this.V3DatatokenTemplate.deploy({
+      data: this.V3DatatokenTemplateBytecode,
+      arguments: [name, symbol, owner, cap, blob, owner]
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+    // deploy the contract and get it's address
+    this.v3DatatokenTemplateAddress = await this.V3DatatokenTemplate.deploy({
+      data: this.V3DatatokenTemplateBytecode,
+      arguments: [name, symbol, owner, cap, blob, owner]
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
+
+    // V3 DT Factory
+    estGas = await this.V3DTFactory.deploy({
+      data: this.V3DTFactoryBytecode,
+      arguments: [this.v3DatatokenTemplateAddress, owner]
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+    // deploy the contract and get it's address
+    this.v3DTFactoryAddress = await this.V3DTFactory.deploy({
+      data: this.V3DTFactoryBytecode,
+      arguments: [this.v3DatatokenTemplateAddress, owner]
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
+
+    // V3 Pool template
+    estGas = await this.V3BPoolTemplate.deploy({
+      data: this.V3BPoolTemplateBytecode,
+      arguments: []
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+
+    this.v3BPoolTemplateAddress = await this.V3BPoolTemplate.deploy({
+      data: this.V3BPoolTemplateBytecode,
+      arguments: []
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
+
+    // V3 Pool Factory
+    estGas = await this.V3BFactory.deploy({
+      data: this.V3BFactoryBytecode,
+      arguments: [this.v3BPoolTemplateAddress]
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+
+    this.v3BFactoryAddress = await this.V3BFactory.deploy({
+      data: this.V3BFactoryBytecode,
+      arguments: [this.v3BPoolTemplateAddress]
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
 
     // DEPLOY OPF Fee Collector
     // get est gascost
