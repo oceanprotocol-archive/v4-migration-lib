@@ -65,6 +65,10 @@ export class TestContractHandler {
   public v3DTFactoryAddress: string
   public v3BPoolTemplateAddress: string
   public v3DatatokenTemplateAddress: string
+  public v3dt1Address: string | void
+  public v3dt2Address: string | void
+  public v3pool1Address: string
+  public v3pool2Address: string
   public web3: Web3
 
   constructor(
@@ -584,6 +588,7 @@ export class TestContractHandler {
         return contract.options.address
       })
 
+    // V3 DT and Pool Creation
     const RouterContract = new this.web3.eth.Contract(
       routerABI,
       this.routerAddress
@@ -592,6 +597,60 @@ export class TestContractHandler {
     const MigrationContract = new this.web3.eth.Contract(
       V4Migration.abi as AbiItem[],
       this.migrationAddress
+    )
+    const V3DtFactory = new this.web3.eth.Contract(
+      V3DTFactory.abi as AbiItem[],
+      this.v3DTFactoryAddress
+    )
+
+    const V3PoolFactory = new this.web3.eth.Contract(
+      V3BFactory.abi as AbiItem[],
+      this.v3BFactoryAddress
+    )
+    let trxReceipt
+    // CREATE V3 datatoken1
+    trxReceipt = await V3DtFactory.methods
+      .createToken(
+        'https://dataset1.dao',
+        'Token1',
+        'Tk1',
+        this.web3.utils.toWei('10000')
+      )
+      .send({ from: owner })
+
+    this.v3dt1Address =
+      trxReceipt.events.TokenCreated.returnValues.newTokenAddress
+
+    trxReceipt = await V3DtFactory.methods
+      .createToken(
+        'https://dataset2.dao',
+        'Token2',
+        'Tk2',
+        this.web3.utils.toWei('10000')
+      )
+      .send({ from: owner })
+
+    this.v3dt2Address =
+      trxReceipt.events.TokenCreated.returnValues.newTokenAddress
+
+    // DEPLOY V3 POOL1
+    trxReceipt = await V3PoolFactory.methods.newBPool().send({ from: owner })
+    this.v3pool1Address =
+      trxReceipt.events.BPoolCreated.returnValues.newBPoolAddress
+
+    const V3Pool1 = new this.web3.eth.Contract(
+      V3BPoolTemplate.abi as AbiItem[],
+      this.v3pool1Address
+    )
+
+    // DEPLOY V3 POOL2
+    trxReceipt = await V3PoolFactory.methods.newBPool().send({ from: owner })
+    this.v3pool2Address =
+      trxReceipt.events.BPoolCreated.returnValues.newBPoolAddress
+
+    const V3Pool2 = new this.web3.eth.Contract(
+      V3BPoolTemplate.abi as AbiItem[],
+      this.v3pool2Address
     )
 
     await RouterContract.methods
