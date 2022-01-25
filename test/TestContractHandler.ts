@@ -707,6 +707,18 @@ export class TestContractHandler {
     console.log(await V3Pool1.methods.isFinalized().call())
     console.log(await V3Pool2.methods.isFinalized().call())
 
+    // v3 lpt owner transfer half of his LPTs to user1 and user2 (30 y 20 Lpts respectively)
+    await V3Pool1.methods
+      .transfer(this.accounts[1], this.web3.utils.toWei('30')) // 30 out of 100
+      .send({ from: owner })
+    await V3Pool1.methods
+      .transfer(this.accounts[2], this.web3.utils.toWei('20')) // 20 out of 100
+      .send({ from: owner })
+
+    console.log(await V3Pool1.methods.balanceOf(this.accounts[1]).call())
+    console.log(await V3Pool1.methods.balanceOf(this.accounts[2]).call())
+
+    // V4 set up
     await RouterContract.methods
       .addFactory(this.factory721Address)
       .send({ from: owner })
