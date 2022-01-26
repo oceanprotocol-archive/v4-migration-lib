@@ -12,11 +12,18 @@ import Dispenser from '@oceanprotocol/contracts/artifacts/contracts/pools/dispen
 import FixedRate from '@oceanprotocol/contracts/artifacts/contracts/pools/fixedRate/FixedRateExchange.sol/FixedRateExchange.json'
 import OPFCommunityFeeCollector from '@oceanprotocol/contracts/artifacts/contracts/communityFee/OPFCommunityFeeCollector.sol/OPFCommunityFeeCollector.json'
 import PoolTemplate from '@oceanprotocol/contracts/artifacts/contracts/pools/balancer/BPool.sol/BPool.json'
-
+import { ZERO_ADDRESS } from '../../src/utils/Constants'
 const web3 = new Web3('http://127.0.0.1:8545')
 
 describe('Migration test', () => {
-  let oceanDAO: string
+  let v3DtOwner: string
+  let user1: string
+  let user2: string
+  let v3dt1Address: string
+  let v3dt2Address: string
+  let v3pool1Address: string
+  let v3pool2Address: string
+  let migrationAddress: string
   let contracts: TestContractHandler
   let migration: Migration
 
@@ -44,9 +51,17 @@ describe('Migration test', () => {
       OPFCommunityFeeCollector.bytecode
     )
     await contracts.getAccounts()
-    oceanDAO = contracts.accounts[0]
+    v3DtOwner = contracts.accounts[0]
+    user1 = contracts.accounts[1]
+    user2 = contracts.accounts[2]
 
-    await contracts.deployContracts(oceanDAO, Router.abi as AbiItem[])
+    await contracts.deployContracts(v3DtOwner, Router.abi as AbiItem[])
+    //console.log(contracts)
+    v3dt1Address = contracts.v3dt1Address
+    v3dt2Address = contracts.v3dt2Address
+    v3pool1Address = contracts.v3pool1Address
+    v3pool2Address = contracts.v3pool2Address
+    migrationAddress = contracts.migrationAddress
   })
 
   it('should initiate Migration instance', async () => {
@@ -55,18 +70,109 @@ describe('Migration test', () => {
   })
 
   it('#getNftFactory - should return Nft Factory address', async () => {
-    expect(await migration.getNftFactory(contracts.migrationAddress)).to.equal(
+    expect(await migration.getNftFactory(migrationAddress)).to.equal(
       contracts.factory721Address
     )
   })
   it('#getOcean - should return Ocean address', async () => {
-    expect(await migration.getOcean(contracts.migrationAddress)).to.equal(
+    expect(await migration.getOcean(migrationAddress)).to.equal(
       contracts.oceanAddress
     )
   })
   it('#getPoolTemplate - should return Pool template address', async () => {
+    expect(await migration.getPoolTemplate(migrationAddress)).to.equal(
+      contracts.poolTemplateAddress
+    )
+  })
+  it('#startMigration - should succed to call startMigration', async () => {
     expect(
-      await migration.getPoolTemplate(contracts.migrationAddress)
-    ).to.equal(contracts.poolTemplateAddress)
+      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+    ).to.equal('0')
+    expect(
+      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+        .poolV3Address
+    ).to.equal(ZERO_ADDRESS)
+
+    await migration.startMigration(
+      v3DtOwner,
+      migrationAddress,
+      v3dt1Address,
+      v3pool1Address,
+      'didV3',
+      'tokenURI',
+      ['NFTname', 'NFTsymbol'],
+      ['ERC20name', 'ERC20symbol']
+    )
+    expect(
+      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+    ).to.equal('1')
+    expect(
+      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+        .poolV3Address
+    ).to.equal(v3pool1Address)
+  })
+
+  it('#addShares - v3DtOwner adds his LPTs', async () => {
+    expect(
+      (
+        await migration.getShareAllocation(
+          migrationAddress,
+          v3pool1Address,
+          v3DtOwner
+        )
+      ).userV3Shares
+    ).to.equal(web3.utils.toWei('0'))
+
+    await migration.approve(
+      v3DtOwner,
+      v3pool1Address,
+      migrationAddress,
+      web3.utils.toWei('50')
+    )
+
+    await migration.addShares(
+      v3DtOwner,
+      migrationAddress,
+      v3pool1Address,
+      web3.utils.toWei('50')
+    )
+
+    expect(
+      (
+        await migration.getShareAllocation(
+          migrationAddress,
+          v3pool1Address,
+          v3DtOwner
+        )
+      ).userV3Shares
+    ).to.equal(web3.utils.toWei('50'))
+  })
+  it('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
+    expect(
+      (
+        await migration.getShareAllocation(
+          migrationAddress,
+          v3pool1Address,
+          v3DtOwner
+        )
+      ).userV3Shares
+    ).to.equal(web3.utils.toWei('50'))
+
+    await migration.removeShares(
+      v3DtOwner,
+      migrationAddress,
+      v3pool1Address,
+      web3.utils.toWei('50')
+    )
+
+    expect(
+      (
+        await migration.getShareAllocation(
+          migrationAddress,
+          v3pool1Address,
+          v3DtOwner
+        )
+      ).userV3Shares
+    ).to.equal(web3.utils.toWei('0'))
   })
 })

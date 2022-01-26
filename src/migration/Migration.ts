@@ -2,6 +2,7 @@ import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
 import { abi } from './../artifacts/V4Migration.json'
+import ERC20 from './../artifacts/V3DataTokenTemplate.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 
@@ -9,7 +10,7 @@ import { Contract } from 'web3-eth-contract'
  * Pool Info
  */
 export interface PoolStatus {
-  migrationStatus: number
+  status: number
   poolV3Address: string
   poolV4Address: string
   didV3: string
@@ -62,6 +63,79 @@ export class Migration {
     this.migrationAbi = migrationAbi || (abi as AbiItem[])
     this.web3 = web3
     this.startBlock = startBlock || 0
+  }
+
+  /**
+   * Estimate gas cost for approve method
+   * @param {String} address User address
+   * @param {String} erc20Address erc20 address
+   * @param {String} spender Spender address
+   * @param {string} amount Number of tokens, in ether units. Will be converted to wei
+   * @param {Contract} contractInstance optional contract instance
+   * @return {Promise<any>}
+   */
+  public async estGasApprove(
+    address: string,
+    erc20Address: string,
+    spender: string,
+    amount: string,
+    contractInstance?: Contract
+  ): Promise<any> {
+    const erc20Contract =
+      contractInstance ||
+      new this.web3.eth.Contract(ERC20.abi as AbiItem[], erc20Address)
+
+    // Estimate gas cost for mint method
+    const gasLimitDefault = this.GASLIMIT_DEFAULT
+    let estGas
+    try {
+      estGas = await erc20Contract.methods
+        .approve(spender, this.web3.utils.toWei(amount))
+        .estimateGas({ from: address }, (err, estGas) =>
+          err ? gasLimitDefault : estGas
+        )
+    } catch (e) {
+      estGas = gasLimitDefault
+    }
+    return estGas
+  }
+
+  /**
+   * Approve
+   * @param {String} address User address
+   * @param {String} erc20Address erc20 address
+   * @param {String} spender Spender address
+   * @param {string} amount Number of tokens, in ether units. Will be converted to wei
+   * @param {Contract} contractInstance optional contract instance
+   * @return {Promise<TransactionReceipt>} trxReceipt
+   */
+  public async approve(
+    address: string,
+    erc20Address: string,
+    spender: string,
+    amount: string,
+    contractInstance?: Contract
+  ): Promise<TransactionReceipt> {
+    const erc20Contract =
+      contractInstance ||
+      new this.web3.eth.Contract(ERC20.abi as AbiItem[], erc20Address)
+
+    const estGas = await this.estGasApprove(
+      address,
+      erc20Address,
+      spender,
+      amount,
+      erc20Contract
+    )
+
+    const trxReceipt = await erc20Contract.methods
+      .approve(spender, this.web3.utils.toWei(amount))
+      .send({
+        from: address,
+        gas: estGas + 1,
+        gasPrice: await getFairGasPrice(this.web3)
+      })
+    return trxReceipt
   }
 
   /** Get NFT Factory Address
