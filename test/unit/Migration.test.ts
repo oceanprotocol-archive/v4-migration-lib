@@ -68,7 +68,6 @@ describe('Migration test', () => {
     migration = new Migration(web3)
     assert(migration != undefined, 'Failed to initialize Migration class')
   })
-
   it('#getNftFactory - should return Nft Factory address', async () => {
     expect(await migration.getNftFactory(migrationAddress)).to.equal(
       contracts.factory721Address
@@ -84,95 +83,249 @@ describe('Migration test', () => {
       contracts.poolTemplateAddress
     )
   })
-  it('#startMigration - should succed to call startMigration', async () => {
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
-    ).to.equal('0')
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
-        .poolV3Address
-    ).to.equal(ZERO_ADDRESS)
-
-    await migration.startMigration(
-      v3DtOwner,
-      migrationAddress,
-      v3dt1Address,
-      v3pool1Address,
-      'didV3',
-      'tokenURI',
-      ['NFTname', 'NFTsymbol'],
-      ['ERC20name', 'ERC20symbol']
+  it('#getDaemon - should return Daemon address', async () => {
+    expect(await migration.getDaemon(migrationAddress)).to.equal(
+      v3DtOwner // in this test Daemon is accounts[0]
     )
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
-    ).to.equal('1')
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
-        .poolV3Address
-    ).to.equal(v3pool1Address)
   })
+  describe('Migration has not started,status == notStarted', () => {
+    it('#startMigration - should revert if not V3DtOwner', async () => {
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('0')
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+          .poolV3Address
+      ).to.equal(ZERO_ADDRESS)
 
-  it('#addShares - v3DtOwner adds his LPTs', async () => {
-    expect(
-      (
-        await migration.getShareAllocation(
+      // TODO: update with proper error handling in Migration class instead of catching it from on-chain, then update assertions
+      try {
+        await migration.startMigration(
+          user1, // user1 is not the v3 dt owner/minter
+          migrationAddress,
+          v3dt1Address,
+          v3pool1Address,
+          'didV3',
+          'tokenURI',
+          ['NFTname', 'NFTsymbol'],
+          ['ERC20name', 'ERC20symbol']
+        )
+      } catch (e) {
+        //  console.log(e.message)
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Caller is not the datatoken publisher'"
+        )
+      }
+
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('0')
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+          .poolV3Address
+      ).to.equal(ZERO_ADDRESS)
+    })
+    it('#addShares - should revert if migration has not started', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+
+      try {
+        await migration.addShares(
+          v3DtOwner,
           migrationAddress,
           v3pool1Address,
-          v3DtOwner
+          web3.utils.toWei('50')
         )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('0'))
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
+        )
+      }
 
-    await migration.approve(
-      v3DtOwner,
-      v3pool1Address,
-      migrationAddress,
-      web3.utils.toWei('50')
-    )
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#removeShares - should revert if migration has not started', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
 
-    await migration.addShares(
-      v3DtOwner,
-      migrationAddress,
-      v3pool1Address,
-      web3.utils.toWei('50')
-    )
-
-    expect(
-      (
-        await migration.getShareAllocation(
+      try {
+        await migration.removeShares(
+          v3DtOwner,
           migrationAddress,
           v3pool1Address,
-          v3DtOwner
+          web3.utils.toWei('50')
         )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('50'))
+      } catch (e) {
+        // console.log(e.message)
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#thrsholdMet - should return false if NO LPT LOCKED', async () => {
+      expect(
+        await migration.thresholdMet(migrationAddress, v3pool1Address)
+      ).to.equal(false)
+    })
+    it('#cancelMigration - should fail to call if not Contract owner or v3DTOwner', async () => {
+      try {
+        await migration.cancelMigration(user1, migrationAddress, v3pool1Address)
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Not OPF or DT owner'"
+        )
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call if status != allowed', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+        )
+      }
+    })
   })
-  it('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('50'))
+  describe('Migration has started, status == allowed', () => {
+    it('#startMigration - should succed to call startMigration if v3DtOwner', async () => {
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('0')
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+          .poolV3Address
+      ).to.equal(ZERO_ADDRESS)
 
-    await migration.removeShares(
-      v3DtOwner,
-      migrationAddress,
-      v3pool1Address,
-      web3.utils.toWei('50')
-    )
+      await migration.startMigration(
+        v3DtOwner,
+        migrationAddress,
+        v3dt1Address,
+        v3pool1Address,
+        'didV3',
+        'tokenURI',
+        ['NFTname', 'NFTsymbol'],
+        ['ERC20name', 'ERC20symbol']
+      )
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('1')
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+          .poolV3Address
+      ).to.equal(v3pool1Address)
+    })
 
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('0'))
+    it('#addShares - v3DtOwner adds his LPTs', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+
+      await migration.addShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('50')
+      )
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('50'))
+    })
+    it('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('50'))
+
+      await migration.removeShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('50')
+      )
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
   })
 })

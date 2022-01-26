@@ -496,7 +496,6 @@ export class Migration {
     address: string,
     migrationAddress: string,
     poolAddressV3: string,
-    lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<any> {
     const migrationContract =
@@ -529,7 +528,6 @@ export class Migration {
     address: string,
     migrationAddress: string,
     poolAddressV3: string,
-    lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<string> {
     // Create migration object
@@ -541,7 +539,6 @@ export class Migration {
       address,
       migrationAddress,
       poolAddressV3,
-      lptV3Amount,
       migrationContract
     )
 
@@ -623,7 +620,7 @@ export class Migration {
     )
 
     const trxReceipt = await migrationContract.methods
-      .liquidateAndCreatePool(poolAddressV3)
+      .liquidateAndCreatePool(poolAddressV3, [oceanInWei, v3DtInWei])
       .send({
         from: address,
         gas: estGas + 1,

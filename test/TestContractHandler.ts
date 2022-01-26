@@ -148,7 +148,6 @@ export class TestContractHandler {
     const name = 'Template'
     const symbol = 'TEMPL'
     const cap = this.web3.utils.toWei('100000')
-    const minter = owner
     const blob = 'https://example.com/dataset-1'
 
     // v3 Datatoken Template
@@ -608,6 +607,7 @@ export class TestContractHandler {
       this.v3BFactoryAddress
     )
     let trxReceipt
+
     // CREATE V3 datatoken1
     trxReceipt = await V3DtFactory.methods
       .createToken('https://dataset1.dao', 'Token1', 'Tk1', cap)
@@ -678,7 +678,7 @@ export class TestContractHandler {
       .approve(this.v3pool2Address, MAX)
       .send({ from: owner })
 
-    // SETUP INITIAL POOLS
+    // SETUP v3 POOLS
 
     await V3Pool1.methods
       .setup(
