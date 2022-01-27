@@ -13,6 +13,7 @@ import FixedRate from '@oceanprotocol/contracts/artifacts/contracts/pools/fixedR
 import OPFCommunityFeeCollector from '@oceanprotocol/contracts/artifacts/contracts/communityFee/OPFCommunityFeeCollector.sol/OPFCommunityFeeCollector.json'
 import PoolTemplate from '@oceanprotocol/contracts/artifacts/contracts/pools/balancer/BPool.sol/BPool.json'
 import { ZERO_ADDRESS } from '../../src/utils/Constants'
+import BN from 'bn.js'
 const web3 = new Web3('http://127.0.0.1:8545')
 
 describe('Migration test', () => {
@@ -360,7 +361,7 @@ describe('Migration test', () => {
           .poolV3Address
       ).to.equal(ZERO_ADDRESS)
 
-      await migration.startMigration(
+      const txReceipt = await migration.startMigration(
         v3DtOwner,
         migrationAddress,
         v3dt1Address,
@@ -377,8 +378,49 @@ describe('Migration test', () => {
         (await migration.getPoolStatus(migrationAddress, v3pool1Address))
           .poolV3Address
       ).to.equal(v3pool1Address)
-    })
 
+      expect(txReceipt.events.Started != null)
+
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+      // console.log(poolStatus)
+      expect(poolStatus.status).to.equal('1')
+      expect(poolStatus.poolV3Address).to.equal(v3pool1Address)
+      expect(poolStatus.didV3).to.equal('didV3')
+      expect(poolStatus.didV4).to.equal('')
+      expect(poolStatus.owner).to.equal(v3DtOwner)
+      expect(poolStatus.poolV4Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.dtV3Address).to.equal(v3dt1Address)
+      expect(poolStatus.poolShareOwners.length).to.equal(0)
+      expect(poolStatus.totalOcean).to.equal('0')
+      expect(poolStatus.totalDTBurnt).to.equal('0')
+      expect(poolStatus.newLPTAmount).to.equal('0')
+      expect(poolStatus.lptRounding).to.equal('0')
+    })
+    it('#startMigration - reverts if has already started.', async () => {
+      try {
+        await migration.startMigration(
+          v3DtOwner,
+          migrationAddress,
+
+          v3dt1Address,
+          v3pool1Address,
+          'didV3',
+          'tokenURI',
+          ['NFTname', 'NFTsymbol'],
+          ['ERC20name', 'ERC20symbol']
+        )
+      } catch (e) {
+        // console.log(e.message)
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
+        )
+      }
+    })
+    // In this part we are going to unit test with threshold NOT met
     it('#addShares - v3DtOwner adds his LPTs', async () => {
       expect(
         (
@@ -414,7 +456,288 @@ describe('Migration test', () => {
         ).userV3Shares
       ).to.equal(web3.utils.toWei('50'))
     })
-    it('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
+    it('#removeShares - reverts when user requests removal of more shares than they have added.', async () => {
+      const shares = web3.utils.toWei('50')
+      expect(shares).to.equal(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      )
+
+      try {
+        await migration.removeShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          new BN(shares).add(new BN(10)).toString() // more that we actually have
+        )
+      } catch (e) {
+        //console.log(e.message)
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'User does not have sufficient shares locked up'"
+        )
+      }
+    })
+    it('#removeShares - should remove shares if deadline has not passed.', async () => {
+      expect(
+        parseInt(
+          (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+            .deadline
+        )
+      ).gt(await web3.eth.getBlockNumber())
+
+      await migration.removeShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('25')
+      )
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('25'))
+    })
+    it('#thresholdMet - should return false for 0 LPT LOCKED', async () => {
+      expect(
+        await migration.thresholdMet(migrationAddress, v3pool1Address)
+      ).to.equal(false)
+    })
+    it('#cancelMigration - should fail to call if not Contract owner or v3DTOwner', async () => {
+      try {
+        await migration.cancelMigration(user1, migrationAddress, v3pool1Address)
+      } catch (e) {
+        //console.log(e.message)
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Not OPF or DT owner'"
+        )
+      }
+    })
+    it('#cancelMigration - should succeed to cancel if threshold not met and status == allowed', async () => {
+      //TODO: check direct balance after returning v3 LPTs when cancelled
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('1')
+      await migration.cancelMigration(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address
+      )
+      expect(
+        (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
+      ).to.equal('0')
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal('0')
+    })
+    it('#liquidateAndCreatePool - should fail to call if status != allowed', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+        )
+      }
+    })
+    it('#getPoolStatus - should return default values', async () => {
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+
+      expect(poolStatus.status).to.equal('0')
+      expect(poolStatus.poolV3Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.poolV4Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.didV3).to.equal('')
+      expect(poolStatus.didV4).to.equal('')
+      expect(poolStatus.dtV3Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.totalOcean).to.equal('0')
+      expect(poolStatus.totalDTBurnt).to.equal('0')
+      expect(poolStatus.newLPTAmount).to.equal('0')
+      expect(poolStatus.lptRounding).to.equal('0')
+      expect(poolStatus.deadline).to.equal('0')
+    })
+    it('#getTokensDetails- should return default values', async () => {
+      const tokensDetails = await migration.getTokensDetails(
+        migrationAddress,
+        v3pool1Address
+      )
+
+      expect(tokensDetails.erc721Address).to.equal(ZERO_ADDRESS)
+      expect(tokensDetails.dtV4Address).to.equal(ZERO_ADDRESS)
+      expect(tokensDetails.nftName).to.equal('')
+      expect(tokensDetails.nftSymbol).to.equal('')
+      expect(tokensDetails.tokenURI).to.equal('')
+      expect(tokensDetails.erc20Name).to.equal('')
+      expect(tokensDetails.erc20Symbol).to.equal('')
+    })
+    it('#getSharesAllocation- should return default values for any user', async () => {
+      let sharesAllocation = await migration.getShareAllocation(
+        migrationAddress,
+        v3pool1Address,
+        user1
+      )
+
+      expect(sharesAllocation.userV3Shares).to.equal('0')
+      expect(sharesAllocation.userV4Shares).to.equal('0')
+      expect(sharesAllocation.alreadyAdded).to.equal(false)
+
+      sharesAllocation = await migration.getShareAllocation(
+        migrationAddress,
+        v3pool1Address,
+        v3DtOwner
+      )
+
+      expect(sharesAllocation.userV3Shares).to.equal('0')
+      expect(sharesAllocation.userV4Shares).to.equal('0')
+      expect(sharesAllocation.alreadyAdded).to.equal(false)
+    })
+    it('Migration successfully restarts', async () => {
+      await migration.startMigration(
+        v3DtOwner,
+        migrationAddress,
+        v3dt1Address,
+        v3pool1Address,
+        'didV3',
+        'tokenURI',
+        ['NFTname', 'NFTsymbol'],
+        ['ERC20name', 'ERC20symbol']
+      )
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+      expect(poolStatus.status).to.equal('1')
+      expect(poolStatus.poolV3Address).to.equal(v3pool1Address)
+      expect(poolStatus.didV3).to.equal('didV3')
+    })
+
+    // Now we add enough shares so we can unit test with threshold met
+    xit('#addShares - all user add their LPTs, Threshold is MET', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user1
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user2
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+      await migration.approve(
+        user1,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('30')
+      )
+      await migration.approve(
+        user2,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('20')
+      )
+
+      await migration.addShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('50')
+      )
+      await migration.addShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('20')
+      )
+      await migration.addShares(
+        v3DtOwner,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('30')
+      )
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('50'))
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user1
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('30'))
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user2
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('20'))
+
+      expect(
+        await migration.thresholdMet(migrationAddress, v3pool1Address)
+      ).to.equal(true)
+    })
+
+    xit('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
       expect(
         (
           await migration.getShareAllocation(

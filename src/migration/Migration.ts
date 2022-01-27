@@ -10,7 +10,7 @@ import { Contract } from 'web3-eth-contract'
  * Pool Info
  */
 export interface PoolStatus {
-  status: number
+  status: string
   poolV3Address: string
   poolV4Address: string
   didV3: string
@@ -18,11 +18,11 @@ export interface PoolStatus {
   owner: string
   poolShareOwners: string[]
   dtV3Address: string
-  totalOcean: number
-  totalDTBurnt: number
-  newLPTAmount: number
-  lptRounding: number
-  deadline: number
+  totalOcean: string
+  totalDTBurnt: string
+  newLPTAmount: string
+  lptRounding: string
+  deadline: string
 }
 
 /**
@@ -277,7 +277,7 @@ export class Migration {
     nftNameAndSymbol: string[],
     erc20NameAndSymbol: string[],
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     // Create migration object
     const migrationContract =
       contractInstance ||
