@@ -142,7 +142,11 @@ export class TestContractHandler {
     return this.accounts
   }
 
-  public async deployContracts(owner: string, routerABI?: AbiItem | AbiItem[]) {
+  public async deployContracts(
+    owner: string,
+    daemon: string,
+    routerABI?: AbiItem | AbiItem[]
+  ) {
     let estGas
     // DEPLOY V3 CONTRACTS, DT template , DT Factory, BPool and BFactory
     const name = 'Template'
@@ -539,7 +543,7 @@ export class TestContractHandler {
         this.factory721Address,
         this.oceanAddress,
         this.poolTemplateAddress,
-        owner
+        daemon
       ]
     }).estimateGas(function (err, estGas) {
       if (err) console.log('DeployContracts: ' + err)
@@ -552,7 +556,7 @@ export class TestContractHandler {
         this.factory721Address,
         this.oceanAddress,
         this.poolTemplateAddress,
-        owner
+        daemon
       ]
     })
       .send({

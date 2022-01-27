@@ -19,6 +19,7 @@ describe('Migration test', () => {
   let v3DtOwner: string
   let user1: string
   let user2: string
+  let daemon: string
   let v3dt1Address: string
   let v3dt2Address: string
   let v3pool1Address: string
@@ -54,8 +55,9 @@ describe('Migration test', () => {
     v3DtOwner = contracts.accounts[0]
     user1 = contracts.accounts[1]
     user2 = contracts.accounts[2]
+    daemon = contracts.accounts[9]
 
-    await contracts.deployContracts(v3DtOwner, Router.abi as AbiItem[])
+    await contracts.deployContracts(v3DtOwner, daemon, Router.abi as AbiItem[])
     //console.log(contracts)
     v3dt1Address = contracts.v3dt1Address
     v3dt2Address = contracts.v3dt2Address
@@ -85,7 +87,7 @@ describe('Migration test', () => {
   })
   it('#getDaemon - should return Daemon address', async () => {
     expect(await migration.getDaemon(migrationAddress)).to.equal(
-      v3DtOwner // in this test Daemon is accounts[0]
+      daemon // in this test Daemon is accounts[9]
     )
   })
   describe('Migration has not started,status == notStarted', () => {
@@ -233,6 +235,119 @@ describe('Migration test', () => {
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
         )
       }
+    })
+    it('#setMetadataAndTransferNFT - daemon should fail to call if status != migrated', async () => {
+      const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
+
+      const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
+      const flagsAndData = [
+        web3.utils.asciiToHex('0x01'),
+        web3.utils.asciiToHex('SomeData')
+      ]
+      const metaDataState = '1'
+      const metadataHash = web3.utils.keccak256('METADATA')
+      const didV4 = 'did:op:0x2121'
+
+      try {
+        await migration.setMetadataAndTransferNFT(
+          daemon,
+          migrationAddress,
+          poolAddress,
+          metaDataState,
+          metaDataDecryptorUrlAndAddress,
+          flagsAndData,
+          metadataHash,
+          didV4
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration not completed yet'"
+        )
+      }
+    })
+    it('#setMetadataAndTransferNFT - user should fail to call if NOT daemon', async () => {
+      const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
+
+      const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
+      const flagsAndData = [
+        web3.utils.asciiToHex('0x01'),
+        web3.utils.asciiToHex('SomeData')
+      ]
+      const metaDataState = '1'
+      const metadataHash = web3.utils.keccak256('METADATA')
+      const didV4 = 'did:op:0x2121'
+
+      try {
+        await migration.setMetadataAndTransferNFT(
+          user1,
+          migrationAddress,
+          poolAddress,
+          metaDataState,
+          metaDataDecryptorUrlAndAddress,
+          flagsAndData,
+          metadataHash,
+          didV4
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'ONLY OPF DAEMON'"
+        )
+      }
+    })
+    it('#getPoolStatus - should return default values', async () => {
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+
+      expect(poolStatus.status).to.equal('0')
+      expect(poolStatus.poolV3Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.poolV4Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.didV3).to.equal('')
+      expect(poolStatus.didV4).to.equal('')
+      expect(poolStatus.dtV3Address).to.equal(ZERO_ADDRESS)
+      expect(poolStatus.totalOcean).to.equal('0')
+      expect(poolStatus.totalDTBurnt).to.equal('0')
+      expect(poolStatus.newLPTAmount).to.equal('0')
+      expect(poolStatus.lptRounding).to.equal('0')
+      expect(poolStatus.deadline).to.equal('0')
+    })
+    it('#getTokensDetails- should return default values', async () => {
+      const tokensDetails = await migration.getTokensDetails(
+        migrationAddress,
+        v3pool1Address
+      )
+
+      expect(tokensDetails.erc721Address).to.equal(ZERO_ADDRESS)
+      expect(tokensDetails.dtV4Address).to.equal(ZERO_ADDRESS)
+      expect(tokensDetails.nftName).to.equal('')
+      expect(tokensDetails.nftSymbol).to.equal('')
+      expect(tokensDetails.tokenURI).to.equal('')
+      expect(tokensDetails.erc20Name).to.equal('')
+      expect(tokensDetails.erc20Symbol).to.equal('')
+    })
+    it('#getSharesAllocation- should return default values for any user', async () => {
+      let sharesAllocation = await migration.getShareAllocation(
+        migrationAddress,
+        v3pool1Address,
+        user1
+      )
+
+      expect(sharesAllocation.userV3Shares).to.equal('0')
+      expect(sharesAllocation.userV4Shares).to.equal('0')
+      expect(sharesAllocation.alreadyAdded).to.equal(false)
+
+      sharesAllocation = await migration.getShareAllocation(
+        migrationAddress,
+        v3pool1Address,
+        v3DtOwner
+      )
+
+      expect(sharesAllocation.userV3Shares).to.equal('0')
+      expect(sharesAllocation.userV4Shares).to.equal('0')
+      expect(sharesAllocation.alreadyAdded).to.equal(false)
     })
   })
   describe('Migration has started, status == allowed', () => {

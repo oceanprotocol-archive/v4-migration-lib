@@ -649,8 +649,8 @@ export class Migration {
     migrationAddress: string,
     poolAddress: string,
     metaDataState: string,
-    metaDataDecryptorUrlAndAddress: string,
-    bytes: string,
+    metaDataDecryptorUrlAndAddress: string[],
+    bytes: string[],
     metaDataHash: string,
     didV4: string,
     contractInstance?: Contract
@@ -687,8 +687,8 @@ export class Migration {
    * @param {String} migrationAddress V4Migration address
    * @param {String} poolAddress v4 pool
    * @param {String} metaDataState metaDataState(0,1,..)
-   * @param {String} metaDataDecryptorUrlAndAddress metaDataState(0,1,..)
-   * @param {String} bytes flags,data
+   * @param {String[]} metaDataDecryptorUrlAndAddress metaDataState(0,1,..) [decryprtoUrl, decryptorAddress]
+   * @param {String[]} bytes [flags,data]
    * @param {String} metaDataHash metaDataHash
    * @param {String} didV4 v4 did
    * @param {Contract} migrationContract optional contract instance
@@ -699,8 +699,8 @@ export class Migration {
     migrationAddress: string,
     poolAddress: string,
     metaDataState: string,
-    metaDataDecryptorUrlAndAddress: string,
-    bytes: string,
+    metaDataDecryptorUrlAndAddress: string[],
+    bytes: string[],
     metaDataHash: string,
     didV4: string,
     contractInstance?: Contract
