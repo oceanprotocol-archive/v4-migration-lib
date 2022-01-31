@@ -5,9 +5,9 @@ import MockERC20 from '@oceanprotocol/contracts/artifacts/contracts/utils/mock/M
 import V4Migration from './../src/artifacts/V4Migration.json'
 import MigrationStaking from './../src/artifacts/MigrationStaking.json'
 import V3BFactory from './../src/artifacts/V3BFactory.json'
-import V3DTFactory from './../src/artifacts/V3DTFactory.json'
+import V3DTFactory from '@oceanprotocol/contracts/artifacts/contracts/v3/V3DTFactory.sol/V3DTFactory.json'
 import V3BPoolTemplate from './../src/artifacts/V3BPool.json'
-import V3DatatokenTemplate from './../src/artifacts/V3DataTokenTemplate.json'
+import V3DatatokenTemplate from '@oceanprotocol/contracts/artifacts/contracts/v3/V3DataTokenTemplate.sol/V3DataTokenTemplate.json'
 
 export class TestContractHandler {
   public accounts: string[]

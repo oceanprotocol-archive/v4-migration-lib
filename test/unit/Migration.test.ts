@@ -1,7 +1,6 @@
 import { assert, expect } from 'chai'
 import { AbiItem } from 'web3-utils/types'
 import { TestContractHandler } from '../TestContractHandler'
-import { Contract } from 'web3-eth-contract'
 import Web3 from 'web3'
 import { Migration } from '../../src/migration/Migration'
 import IERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'

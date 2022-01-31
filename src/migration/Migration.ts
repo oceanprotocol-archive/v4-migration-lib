@@ -1,8 +1,10 @@
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
-import { abi } from './../artifacts/V4Migration.json'
-import ERC20 from './../artifacts/V3DataTokenTemplate.json'
+import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
+
+import ERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
+
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 
@@ -60,7 +62,7 @@ export class Migration {
     migrationAbi?: AbiItem | AbiItem[],
     startBlock?: number
   ) {
-    this.migrationAbi = migrationAbi || (abi as AbiItem[])
+    this.migrationAbi = migrationAbi || (MigrationAbi as AbiItem[])
     this.web3 = web3
     this.startBlock = startBlock || 0
   }
