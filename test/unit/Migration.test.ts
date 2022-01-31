@@ -923,5 +923,13 @@ describe('Migration test', () => {
         )
       }
     })
+    it('#liquidateAndCreatePool - should succeed to liquidate Pool', async () => {
+      const receipt = await migration.liquidateAndCreatePool(
+        user1,
+        migrationAddress,
+        v3pool1Address,
+        ['1', '1']
+      )
+    })
   })
 })
