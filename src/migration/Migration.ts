@@ -603,7 +603,7 @@ export class Migration {
     poolAddressV3: string,
     minAmountsOut: string[],
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)

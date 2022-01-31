@@ -1,8 +1,10 @@
 import { assert, expect } from 'chai'
 import { AbiItem } from 'web3-utils/types'
 import { TestContractHandler } from '../TestContractHandler'
+import { Contract } from 'web3-eth-contract'
 import Web3 from 'web3'
 import { Migration } from '../../src/migration/Migration'
+import IERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
 import ERC721Factory from '@oceanprotocol/contracts/artifacts/contracts/ERC721Factory.sol/ERC721Factory.json'
 import ERC721Template from '@oceanprotocol/contracts/artifacts/contracts/templates/ERC721Template.sol/ERC721Template.json'
 import SideStaking from '@oceanprotocol/contracts/artifacts/contracts/pools/ssContracts/SideStaking.sol/SideStaking.json'
@@ -12,7 +14,7 @@ import Dispenser from '@oceanprotocol/contracts/artifacts/contracts/pools/dispen
 import FixedRate from '@oceanprotocol/contracts/artifacts/contracts/pools/fixedRate/FixedRateExchange.sol/FixedRateExchange.json'
 import OPFCommunityFeeCollector from '@oceanprotocol/contracts/artifacts/contracts/communityFee/OPFCommunityFeeCollector.sol/OPFCommunityFeeCollector.json'
 import PoolTemplate from '@oceanprotocol/contracts/artifacts/contracts/pools/balancer/BPool.sol/BPool.json'
-import { ZERO_ADDRESS } from '../../src/utils/Constants'
+import { ZERO_ADDRESS, ONE_ADDRESS } from '../../src/utils/Constants'
 import BN from 'bn.js'
 const web3 = new Web3('http://127.0.0.1:8545')
 
@@ -28,6 +30,8 @@ describe('Migration test', () => {
   let migrationAddress: string
   let contracts: TestContractHandler
   let migration: Migration
+  let oceanAddress: string
+  let migrationStakingAddress: string
 
   it('should deploy contracts', async () => {
     contracts = new TestContractHandler(
@@ -65,6 +69,8 @@ describe('Migration test', () => {
     v3pool1Address = contracts.v3pool1Address
     v3pool2Address = contracts.v3pool2Address
     migrationAddress = contracts.migrationAddress
+    oceanAddress = contracts.oceanAddress
+    migrationStakingAddress = contracts.migrationStakingAddress
   })
 
   it('should initiate Migration instance', async () => {
@@ -923,13 +929,256 @@ describe('Migration test', () => {
         )
       }
     })
-    it('#liquidateAndCreatePool - should succeed to liquidate Pool', async () => {
-      const receipt = await migration.liquidateAndCreatePool(
+
+    it('#liquidateAndCreatePool - we now liquidate the pool', async () => {
+      const txReceipt = await migration.liquidateAndCreatePool(
         user1,
         migrationAddress,
         v3pool1Address,
         ['1', '1']
       )
+
+      assert(txReceipt.events.NewPool.event === 'NewPool')
+      const args = txReceipt.events.NewPool.returnValues
+      console.log(args)
+      const nftAddress = args.nftAddress
+      const v4dtAddress = args.newDTAddress
+      const newPoolAddress = args.newPool
+      const v3DTAddress = args.v3DTAddress
+
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+      const tokensDetails = await migration.getTokensDetails(
+        migrationAddress,
+        v3pool1Address
+      )
+      expect(v3DTAddress).to.equal(poolStatus.dtV3Address)
+      expect(nftAddress).to.equal(tokensDetails.erc721Address)
+      expect(v4dtAddress).to.equal(tokensDetails.dtV4Address)
+      expect(newPoolAddress).to.equal(poolStatus.poolV4Address)
+      // Pool has been migrated (index 2)
+      expect(poolStatus.status).to.equal('2')
+
+      const newPool = new web3.eth.Contract(
+        PoolTemplate.abi as AbiItem[],
+        newPoolAddress
+      )
+      //console.log(newPool)
+
+      const oceanContract = new web3.eth.Contract(
+        IERC20.abi as AbiItem[],
+        oceanAddress
+      )
+      const v4DT = new web3.eth.Contract(
+        ERC20Template.abi as AbiItem[],
+        v4dtAddress
+      )
+      const nft = new web3.eth.Contract(
+        ERC721Template.abi as AbiItem[],
+        nftAddress
+      )
+
+      const v3DT = new web3.eth.Contract(
+        ERC20Template.abi as AbiItem[],
+        v3DTAddress
+      )
+
+      // NFT is still in the Migration contract
+      expect(await nft.methods.ownerOf(1).call()).to.equal(migrationAddress)
+
+      // v3DT owner hasn't received any v4 dts
+      expect(await v4DT.methods.balanceOf(v3DtOwner).call()).to.equal('0')
+      //   // NO OCEAN, nor v3 dts stay in the migrationStaking
+
+      expect(
+        await oceanContract.methods.balanceOf(migrationStakingAddress).call()
+      ).to.equal('0')
+      expect(
+        await v3DT.methods.balanceOf(migrationStakingAddress).call()
+      ).to.equal('0')
+
+      // max cap is minted into the migrationStaking,
+      // balance in migrationStaking is cap minus what we added in the pool
+      expect(
+        new BN(
+          await v4DT.methods.balanceOf(migrationStakingAddress).call()
+        ).toString()
+      ).to.equal(
+        new BN(await v4DT.methods.cap().call())
+          .sub(new BN(await v4DT.methods.balanceOf(newPoolAddress).call()))
+          .toString()
+      )
+
+      // NO OCEAN, nor v3 or v4 dt stay in migration
+      expect(await v4DT.methods.balanceOf(migrationAddress).call()).to.equal(
+        '0'
+      )
+      expect(
+        await oceanContract.methods.balanceOf(migrationAddress).call()
+      ).to.equal('0')
+      expect(await v3DT.methods.balanceOf(migrationAddress).call()).to.equal(
+        '0'
+      )
+      // v3DTs were sent to the address(1)
+      expect(await v3DT.methods.balanceOf(ONE_ADDRESS).call()).to.equal(
+        poolStatus.totalDTBurnt
+      )
+      // same amount of token burnt in address one to equal new v4dt balance in pool
+      // Both all the new dts and all oceans are in the pool
+      expect(await v4DT.methods.balanceOf(newPoolAddress).call()).to.equal(
+        poolStatus.totalDTBurnt
+      )
+      expect(
+        await oceanContract.methods.balanceOf(newPoolAddress).call()
+      ).to.equal(poolStatus.totalOcean)
+
+      // total new LPT amount is equal to the sum of the LP PROVIDERS + what might be left in the migration contract
+      expect(poolStatus.newLPTAmount).to.equal(
+        new BN(await newPool.methods.balanceOf(v3DtOwner).call())
+          .add(new BN(await newPool.methods.balanceOf(migrationAddress).call()))
+          .add(new BN(await newPool.methods.balanceOf(user1).call()))
+          .add(new BN(await newPool.methods.balanceOf(user2).call()))
+          .toString()
+      )
+
+      // check we stored the information properly
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV4Shares
+      ).to.equal(await newPool.methods.balanceOf(v3DtOwner).call())
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user1
+          )
+        ).userV4Shares
+      ).to.equal(await newPool.methods.balanceOf(user1).call())
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            user2
+          )
+        ).userV4Shares
+      ).to.equal(await newPool.methods.balanceOf(user2).call())
+    })
+
+    it('#addShares -  adding shares not allowed if status != allowed', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+
+      try {
+        await migration.addShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#removeShares -  adding shares not allowed if status != allowed.', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      try {
+        await migration.removeShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        // console.log(e.message)
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#cancelMigration - should fail to cancel if already migrated', async () => {
+      try {
+        await migration.cancelMigration(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+        )
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call AGAIN ', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+        )
+      }
     })
   })
 })
