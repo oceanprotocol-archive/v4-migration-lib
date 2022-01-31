@@ -637,7 +637,7 @@ describe('Migration test', () => {
     })
 
     // Now we add enough shares so we can unit test with threshold met
-    xit('#addShares - all user add their LPTs, Threshold is MET', async () => {
+    it('#addShares - all user add their LPTs, Threshold is MET', async () => {
       expect(
         (
           await migration.getShareAllocation(
@@ -682,7 +682,7 @@ describe('Migration test', () => {
         user2,
         v3pool1Address,
         migrationAddress,
-        web3.utils.toWei('20')
+        web3.utils.toWei('19')
       )
 
       await migration.addShares(
@@ -692,16 +692,17 @@ describe('Migration test', () => {
         web3.utils.toWei('50')
       )
       await migration.addShares(
-        v3DtOwner,
-        migrationAddress,
-        v3pool1Address,
-        web3.utils.toWei('20')
-      )
-      await migration.addShares(
-        v3DtOwner,
+        user1,
         migrationAddress,
         v3pool1Address,
         web3.utils.toWei('30')
+      )
+      // we don't add the full amount because actually the pool can't be fully removed (balancer pool logic requires 1000 wei or around to be kept)
+      await migration.addShares(
+        user2,
+        migrationAddress,
+        v3pool1Address,
+        web3.utils.toWei('19')
       )
 
       expect(
@@ -730,14 +731,115 @@ describe('Migration test', () => {
             user2
           )
         ).userV3Shares
-      ).to.equal(web3.utils.toWei('20'))
+      ).to.equal(web3.utils.toWei('19'))
 
       expect(
         await migration.thresholdMet(migrationAddress, v3pool1Address)
       ).to.equal(true)
     })
 
-    xit('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
+    // A migration cannot be cancelled if threshold is MET (anytime but here tested before deadline)
+    it('#cancelMigration - should fail to cancel if threshold is MET (before DEADLINE)', async () => {
+      try {
+        await migration.cancelMigration(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Threshold already met'"
+        )
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call BEFORE deadline even if threshold is MET', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Cannot be called before deadline'"
+        )
+      }
+    })
+
+    it('#setMetadataAndTransferNFT - daemon should fail to call if status != migrated', async () => {
+      const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
+
+      const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
+      const flagsAndData = [
+        web3.utils.asciiToHex('0x01'),
+        web3.utils.asciiToHex('SomeData')
+      ]
+      const metaDataState = '1'
+      const metadataHash = web3.utils.keccak256('METADATA')
+      const didV4 = 'did:op:0x2121'
+
+      try {
+        await migration.setMetadataAndTransferNFT(
+          daemon,
+          migrationAddress,
+          poolAddress,
+          metaDataState,
+          metaDataDecryptorUrlAndAddress,
+          flagsAndData,
+          metadataHash,
+          didV4
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration not completed yet'"
+        )
+      }
+    })
+    it('# check current states and advance blocks AFTER deadline', async () => {
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+      expect(poolStatus.status).to.equal('1')
+      expect(poolStatus.poolV3Address).to.equal(v3pool1Address)
+      expect(poolStatus.didV3).to.equal('didV3')
+      expect(
+        await migration.thresholdMet(migrationAddress, v3pool1Address)
+      ).to.equal(true)
+      expect(
+        parseInt(
+          (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+            .deadline
+        )
+      ).gt(await web3.eth.getBlockNumber())
+      // we need to advance some block so we send some transactions
+
+      for (let i = 0; i < 100; i++) {
+        // each one advance a block
+        await web3.eth.sendTransaction({
+          from: user1,
+          to: user2,
+          value: '0'
+        })
+      }
+      // deadline has passed we can now liquidate anytime
+      expect(await web3.eth.getBlockNumber()).gt(
+        parseInt(
+          (await migration.getPoolStatus(migrationAddress, v3pool1Address))
+            .deadline
+        )
+      )
+
+      expect(
+        await migration.thresholdMet(migrationAddress, v3pool1Address)
+      ).to.equal(true)
+    })
+
+    it('#addShares - adding shares not allowed if DEADLINE has passed.', async () => {
       expect(
         (
           await migration.getShareAllocation(
@@ -748,12 +850,26 @@ describe('Migration test', () => {
         ).userV3Shares
       ).to.equal(web3.utils.toWei('50'))
 
-      await migration.removeShares(
+      await migration.approve(
         v3DtOwner,
-        migrationAddress,
         v3pool1Address,
+        migrationAddress,
         web3.utils.toWei('50')
       )
+
+      try {
+        await migration.addShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Deadline reached for adding shares'"
+        )
+      }
 
       expect(
         (
@@ -763,7 +879,49 @@ describe('Migration test', () => {
             v3DtOwner
           )
         ).userV3Shares
-      ).to.equal(web3.utils.toWei('0'))
+      ).to.equal(web3.utils.toWei('50'))
+    })
+
+    it('#removeShares - removing shares not allowed if DEADLINE has passed.', async () => {
+      const shares = web3.utils.toWei('50')
+      expect(shares).to.equal(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      )
+
+      try {
+        await migration.removeShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          shares
+        )
+      } catch (e) {
+        //console.log(e.message)
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Deadline reached for removing shares'"
+        )
+      }
+    })
+    it('#cancelMigration - should fail to cancel if threshold is MET (AFTER deadline)', async () => {
+      try {
+        await migration.cancelMigration(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Threshold already met'"
+        )
+      }
     })
   })
 })
