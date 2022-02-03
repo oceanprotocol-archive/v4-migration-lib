@@ -707,7 +707,7 @@ export class Migration {
     metaDataHash: string,
     didV4: string,
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)

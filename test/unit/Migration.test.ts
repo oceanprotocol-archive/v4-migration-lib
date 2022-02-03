@@ -1180,4 +1180,181 @@ describe('Migration test', () => {
       }
     })
   })
+  describe('Pool has been created, v4 lpts sent and v3 dts burnt,status == migrated', () => {
+    it('#startMigration - reverts if status != notStarted.', async () => {
+      try {
+        await migration.startMigration(
+          v3DtOwner,
+          migrationAddress,
+
+          v3dt1Address,
+          v3pool1Address,
+          'didV3',
+          'tokenURI',
+          ['NFTname', 'NFTsymbol'],
+          ['ERC20name', 'ERC20symbol']
+        )
+      } catch (e) {
+        // console.log(e.message)
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
+        )
+      }
+    })
+
+    it('#addShares - adding shares not allowed if status != allowed', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+
+      try {
+        await migration.addShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#removeShares - removing shares not allowed if status != allowed', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      try {
+        await migration.removeShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        // console.log(e.message)
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#cancelMigration - should fail to cancel if already migrated', async () => {
+      try {
+        await migration.cancelMigration(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+        )
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call AGAIN ', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+        )
+      }
+    })
+    it('#setMetadataAndTransferNFT - daemon should SUCCEED to call if status == migrated', async () => {
+      const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
+      const flagsAndData = [
+        web3.utils.asciiToHex('0x01'),
+        web3.utils.asciiToHex('SomeData')
+      ]
+      const metaDataState = '1'
+      const metadataHash = web3.utils.keccak256('METADATA')
+      const didV4 = 'did:op:0x2121'
+
+      const poolStatus = await migration.getPoolStatus(
+        migrationAddress,
+        v3pool1Address
+      )
+      // Pool has been migrated (index 2)
+      expect(poolStatus.status).to.equal('2')
+      const txReceipt = await migration.setMetadataAndTransferNFT(
+        daemon,
+        migrationAddress,
+        v3pool1Address,
+        metaDataState,
+        metaDataDecryptorUrlAndAddress,
+        flagsAndData,
+        metadataHash,
+        didV4
+      )
+
+      assert(txReceipt.events.Completed.event === 'Completed')
+      const args = txReceipt.events.Completed.returnValues
+
+      expect(args.poolAddress).to.equal(v3pool1Address)
+      // Pool migration has been completed (index 3)
+      expect(args.status).to.equal('3')
+
+      const tokensDetails = await migration.getTokensDetails(
+        migrationAddress,
+        v3pool1Address
+      )
+      const nft = new web3.eth.Contract(
+        ERC721Template.abi as AbiItem[],
+        tokensDetails.erc721Address
+      )
+
+      // NFT has been transferred to the owner
+      expect(await nft.methods.ownerOf(1).call()).to.equal(v3DtOwner)
+    })
+  })
 })
