@@ -119,7 +119,6 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        //  console.log(e.message)
         assert(
           e.message ==
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Caller is not the datatoken publisher'"
@@ -195,7 +194,6 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        // console.log(e.message)
         assert(
           e.message ===
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
@@ -418,7 +416,6 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        // console.log(e.message)
         assert(
           e.message ==
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
@@ -481,7 +478,6 @@ describe('Migration test', () => {
           new BN(shares).add(new BN(10)).toString() // more that we actually have
         )
       } catch (e) {
-        //console.log(e.message)
         assert(
           e.message ===
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'User does not have sufficient shares locked up'"
@@ -522,7 +518,6 @@ describe('Migration test', () => {
       try {
         await migration.cancelMigration(user1, migrationAddress, v3pool1Address)
       } catch (e) {
-        //console.log(e.message)
         assert(
           e.message ==
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Not OPF or DT owner'"
@@ -907,7 +902,6 @@ describe('Migration test', () => {
           shares
         )
       } catch (e) {
-        //console.log(e.message)
         assert(
           e.message ===
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Deadline reached for removing shares'"
@@ -939,7 +933,7 @@ describe('Migration test', () => {
 
       assert(txReceipt.events.NewPool.event === 'NewPool')
       const args = txReceipt.events.NewPool.returnValues
-      console.log(args)
+      // console.log(args)
       const nftAddress = args.nftAddress
       const v4dtAddress = args.newDTAddress
       const newPoolAddress = args.newPool
@@ -1133,7 +1127,6 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        // console.log(e.message)
         assert(
           e.message ===
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
@@ -1195,7 +1188,6 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        // console.log(e.message)
         assert(
           e.message ==
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
@@ -1203,7 +1195,7 @@ describe('Migration test', () => {
       }
     })
 
-    it('#addShares - adding shares not allowed if status != allowed', async () => {
+    it('#addShares - adding shares not allowed if status == migrated', async () => {
       expect(
         (
           await migration.getShareAllocation(
@@ -1245,7 +1237,7 @@ describe('Migration test', () => {
         ).userV3Shares
       ).to.equal(web3.utils.toWei('0'))
     })
-    it('#removeShares - removing shares not allowed if status != allowed', async () => {
+    it('#removeShares - removing shares not allowed if status == migrated', async () => {
       expect(
         (
           await migration.getShareAllocation(
@@ -1264,7 +1256,6 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        // console.log(e.message)
         assert(
           e.message ===
             "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
@@ -1355,6 +1346,134 @@ describe('Migration test', () => {
 
       // NFT has been transferred to the owner
       expect(await nft.methods.ownerOf(1).call()).to.equal(v3DtOwner)
+    })
+  })
+  describe('Migration is completed, Metadata is SET and NFT transferred to V3DTOwner', async () => {
+    it('#startMigration - reverts if status != notStarted.', async () => {
+      try {
+        await migration.startMigration(
+          v3DtOwner,
+          migrationAddress,
+
+          v3dt1Address,
+          v3pool1Address,
+          'didV3',
+          'tokenURI',
+          ['NFTname', 'NFTsymbol'],
+          ['ERC20name', 'ERC20symbol']
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
+        )
+      }
+    })
+    it('#addShares -  adding shares not allowed if status != allowed', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      await migration.approve(
+        v3DtOwner,
+        v3pool1Address,
+        migrationAddress,
+        web3.utils.toWei('50')
+      )
+
+      try {
+        await migration.addShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        assert(
+          e.message ==
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#removeShares -  adding shares not allowed if status != allowed.', async () => {
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+
+      try {
+        await migration.removeShares(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address,
+          web3.utils.toWei('50')
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
+        )
+      }
+
+      expect(
+        (
+          await migration.getShareAllocation(
+            migrationAddress,
+            v3pool1Address,
+            v3DtOwner
+          )
+        ).userV3Shares
+      ).to.equal(web3.utils.toWei('0'))
+    })
+    it('#cancelMigration - should fail to cancel if already migrated', async () => {
+      try {
+        await migration.cancelMigration(
+          v3DtOwner,
+          migrationAddress,
+          v3pool1Address
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+        )
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call again if already completed', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
+        )
+      } catch (e) {
+        assert(
+          e.message ===
+            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+        )
+      }
     })
   })
 })

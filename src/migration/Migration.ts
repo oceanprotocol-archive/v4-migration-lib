@@ -620,7 +620,6 @@ export class Migration {
       [oceanInWei, v3DtInWei],
       migrationContract
     )
-    console.log(estGas)
 
     const trxReceipt = await migrationContract.methods
       .liquidateAndCreatePool(poolAddressV3, [oceanInWei, v3DtInWei])
