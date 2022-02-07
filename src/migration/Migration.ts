@@ -1,8 +1,10 @@
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
-import { abi } from './../artifacts/V4Migration.json'
-import ERC20 from './../artifacts/V3DataTokenTemplate.json'
+import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
+
+import ERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
+
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 
@@ -10,7 +12,7 @@ import { Contract } from 'web3-eth-contract'
  * Pool Info
  */
 export interface PoolStatus {
-  status: number
+  status: string
   poolV3Address: string
   poolV4Address: string
   didV3: string
@@ -18,11 +20,11 @@ export interface PoolStatus {
   owner: string
   poolShareOwners: string[]
   dtV3Address: string
-  totalOcean: number
-  totalDTBurnt: number
-  newLPTAmount: number
-  lptRounding: number
-  deadline: number
+  totalOcean: string
+  totalDTBurnt: string
+  newLPTAmount: string
+  lptRounding: string
+  deadline: string
 }
 
 /**
@@ -60,7 +62,7 @@ export class Migration {
     migrationAbi?: AbiItem | AbiItem[],
     startBlock?: number
   ) {
-    this.migrationAbi = migrationAbi || (abi as AbiItem[])
+    this.migrationAbi = migrationAbi || (MigrationAbi as AbiItem[])
     this.web3 = web3
     this.startBlock = startBlock || 0
   }
@@ -277,7 +279,7 @@ export class Migration {
     nftNameAndSymbol: string[],
     erc20NameAndSymbol: string[],
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     // Create migration object
     const migrationContract =
       contractInstance ||
@@ -496,7 +498,6 @@ export class Migration {
     address: string,
     migrationAddress: string,
     poolAddressV3: string,
-    lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<any> {
     const migrationContract =
@@ -529,7 +530,6 @@ export class Migration {
     address: string,
     migrationAddress: string,
     poolAddressV3: string,
-    lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<string> {
     // Create migration object
@@ -541,7 +541,6 @@ export class Migration {
       address,
       migrationAddress,
       poolAddressV3,
-      lptV3Amount,
       migrationContract
     )
 
@@ -606,7 +605,7 @@ export class Migration {
     poolAddressV3: string,
     minAmountsOut: string[],
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
@@ -623,7 +622,7 @@ export class Migration {
     )
 
     const trxReceipt = await migrationContract.methods
-      .liquidateAndCreatePool(poolAddressV3)
+      .liquidateAndCreatePool(poolAddressV3, [oceanInWei, v3DtInWei])
       .send({
         from: address,
         gas: estGas + 1,
@@ -652,8 +651,8 @@ export class Migration {
     migrationAddress: string,
     poolAddress: string,
     metaDataState: string,
-    metaDataDecryptorUrlAndAddress: string,
-    bytes: string,
+    metaDataDecryptorUrlAndAddress: string[],
+    bytes: string[],
     metaDataHash: string,
     didV4: string,
     contractInstance?: Contract
@@ -690,8 +689,8 @@ export class Migration {
    * @param {String} migrationAddress V4Migration address
    * @param {String} poolAddress v4 pool
    * @param {String} metaDataState metaDataState(0,1,..)
-   * @param {String} metaDataDecryptorUrlAndAddress metaDataState(0,1,..)
-   * @param {String} bytes flags,data
+   * @param {String[]} metaDataDecryptorUrlAndAddress metaDataState(0,1,..) [decryprtoUrl, decryptorAddress]
+   * @param {String[]} bytes [flags,data]
    * @param {String} metaDataHash metaDataHash
    * @param {String} didV4 v4 did
    * @param {Contract} migrationContract optional contract instance
@@ -702,12 +701,12 @@ export class Migration {
     migrationAddress: string,
     poolAddress: string,
     metaDataState: string,
-    metaDataDecryptorUrlAndAddress: string,
-    bytes: string,
+    metaDataDecryptorUrlAndAddress: string[],
+    bytes: string[],
     metaDataHash: string,
     didV4: string,
     contractInstance?: Contract
-  ): Promise<string> {
+  ): Promise<TransactionReceipt> {
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)

@@ -5,9 +5,9 @@ import MockERC20 from '@oceanprotocol/contracts/artifacts/contracts/utils/mock/M
 import V4Migration from './../src/artifacts/V4Migration.json'
 import MigrationStaking from './../src/artifacts/MigrationStaking.json'
 import V3BFactory from './../src/artifacts/V3BFactory.json'
-import V3DTFactory from './../src/artifacts/V3DTFactory.json'
+import V3DTFactory from '@oceanprotocol/contracts/artifacts/contracts/v3/V3DTFactory.sol/V3DTFactory.json'
 import V3BPoolTemplate from './../src/artifacts/V3BPool.json'
-import V3DatatokenTemplate from './../src/artifacts/V3DataTokenTemplate.json'
+import V3DatatokenTemplate from '@oceanprotocol/contracts/artifacts/contracts/v3/V3DataTokenTemplate.sol/V3DataTokenTemplate.json'
 
 export class TestContractHandler {
   public accounts: string[]
@@ -142,13 +142,16 @@ export class TestContractHandler {
     return this.accounts
   }
 
-  public async deployContracts(owner: string, routerABI?: AbiItem | AbiItem[]) {
+  public async deployContracts(
+    owner: string,
+    daemon: string,
+    routerABI?: AbiItem | AbiItem[]
+  ) {
     let estGas
     // DEPLOY V3 CONTRACTS, DT template , DT Factory, BPool and BFactory
     const name = 'Template'
     const symbol = 'TEMPL'
     const cap = this.web3.utils.toWei('100000')
-    const minter = owner
     const blob = 'https://example.com/dataset-1'
 
     // v3 Datatoken Template
@@ -540,7 +543,7 @@ export class TestContractHandler {
         this.factory721Address,
         this.oceanAddress,
         this.poolTemplateAddress,
-        owner
+        daemon
       ]
     }).estimateGas(function (err, estGas) {
       if (err) console.log('DeployContracts: ' + err)
@@ -553,7 +556,7 @@ export class TestContractHandler {
         this.factory721Address,
         this.oceanAddress,
         this.poolTemplateAddress,
-        owner
+        daemon
       ]
     })
       .send({
@@ -608,6 +611,7 @@ export class TestContractHandler {
       this.v3BFactoryAddress
     )
     let trxReceipt
+
     // CREATE V3 datatoken1
     trxReceipt = await V3DtFactory.methods
       .createToken('https://dataset1.dao', 'Token1', 'Tk1', cap)
@@ -678,7 +682,7 @@ export class TestContractHandler {
       .approve(this.v3pool2Address, MAX)
       .send({ from: owner })
 
-    // SETUP INITIAL POOLS
+    // SETUP v3 POOLS
 
     await V3Pool1.methods
       .setup(
