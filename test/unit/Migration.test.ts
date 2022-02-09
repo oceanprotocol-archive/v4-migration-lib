@@ -106,7 +106,6 @@ describe('Migration test', () => {
           .poolV3Address
       ).to.equal(ZERO_ADDRESS)
 
-      // TODO: update with proper error handling in Migration class instead of catching it from on-chain, then update assertions
       try {
         await migration.startMigration(
           user1, // user1 is not the v3 dt owner/minter
@@ -119,10 +118,7 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Caller is not the datatoken publisher'"
-        )
+        assert(e.message == 'Caller is not V3Dt Owner')
       }
 
       expect(
@@ -159,10 +155,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
-        )
+        assert(e.message == 'Adding shares is not currently allowed')
       }
 
       expect(
@@ -194,10 +187,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
-        )
+        assert(e.message === 'Current pool status does not allow share removal')
       }
 
       expect(
@@ -219,10 +209,7 @@ describe('Migration test', () => {
       try {
         await migration.cancelMigration(user1, migrationAddress, v3pool1Address)
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Not OPF or DT owner'"
-        )
+        assert(e.message === 'Not OPF or DT owner')
       }
     })
     it('#liquidateAndCreatePool - should fail to call if status != allowed', async () => {
@@ -234,9 +221,9 @@ describe('Migration test', () => {
           ['1', '1']
         )
       } catch (e) {
+        console.log(e.message)
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+          e.message === 'Current pool status does not allow to liquidate Pool'
         )
       }
     })
@@ -264,15 +251,10 @@ describe('Migration test', () => {
           didV4
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration not completed yet'"
-        )
+        assert(e.message == 'Migration not completed yet')
       }
     })
     it('#setMetadataAndTransferNFT - user should fail to call if NOT daemon', async () => {
-      const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
-
       const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
       const flagsAndData = [
         web3.utils.asciiToHex('0x01'),
@@ -286,7 +268,7 @@ describe('Migration test', () => {
         await migration.setMetadataAndTransferNFT(
           user1,
           migrationAddress,
-          poolAddress,
+          v3pool1Address,
           metaDataState,
           metaDataDecryptorUrlAndAddress,
           flagsAndData,
@@ -294,10 +276,8 @@ describe('Migration test', () => {
           didV4
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'ONLY OPF DAEMON'"
-        )
+        console.log(e.message)
+        assert(e.message == 'ONLY OPF DAEMON')
       }
     })
     it('#getPoolStatus - should return default values', async () => {
@@ -416,10 +396,7 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
-        )
+        assert(e.message == 'Migration process has already been started')
       }
     })
     // In this part we are going to unit test with threshold NOT met
@@ -478,10 +455,7 @@ describe('Migration test', () => {
           new BN(shares).add(new BN(10)).toString() // more that we actually have
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'User does not have sufficient shares locked up'"
-        )
+        assert(e.message === 'User does not have sufficient shares locked up')
       }
     })
     it('#removeShares - should remove shares if deadline has not passed.', async () => {
@@ -518,10 +492,19 @@ describe('Migration test', () => {
       try {
         await migration.cancelMigration(user1, migrationAddress, v3pool1Address)
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Not OPF or DT owner'"
+        assert(e.message == 'Not OPF or DT owner')
+      }
+    })
+    it('#liquidateAndCreatePool - should fail to call if status == allowed but threshold not met', async () => {
+      try {
+        await migration.liquidateAndCreatePool(
+          user1,
+          migrationAddress,
+          v3pool1Address,
+          ['1', '1']
         )
+      } catch (e) {
+        assert(e.message === 'Threshold not met')
       }
     })
     it('#cancelMigration - should succeed to cancel if threshold not met and status == allowed', async () => {
@@ -558,8 +541,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+          e.message === 'Current pool status does not allow to liquidate Pool'
         )
       }
     })
@@ -682,7 +664,7 @@ describe('Migration test', () => {
         user2,
         v3pool1Address,
         migrationAddress,
-        web3.utils.toWei('19')
+        web3.utils.toWei('20')
       )
 
       await migration.addShares(
@@ -702,7 +684,7 @@ describe('Migration test', () => {
         user2,
         migrationAddress,
         v3pool1Address,
-        web3.utils.toWei('19')
+        web3.utils.toWei('20')
       )
 
       expect(
@@ -731,7 +713,7 @@ describe('Migration test', () => {
             user2
           )
         ).userV3Shares
-      ).to.equal(web3.utils.toWei('19'))
+      ).to.equal(web3.utils.toWei('20'))
 
       expect(
         await migration.thresholdMet(migrationAddress, v3pool1Address)
@@ -747,10 +729,7 @@ describe('Migration test', () => {
           v3pool1Address
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Threshold already met'"
-        )
+        assert(e.message == 'Threshold already met')
       }
     })
     it('#liquidateAndCreatePool - should fail to call BEFORE deadline even if threshold is MET', async () => {
@@ -762,16 +741,12 @@ describe('Migration test', () => {
           ['1', '1']
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Cannot be called before deadline'"
-        )
+        console.log(e.message)
+        assert(e.message === 'Cannot be called before deadline')
       }
     })
 
     it('#setMetadataAndTransferNFT - daemon should fail to call if status != migrated', async () => {
-      const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
-
       const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
       const flagsAndData = [
         web3.utils.asciiToHex('0x01'),
@@ -785,7 +760,7 @@ describe('Migration test', () => {
         await migration.setMetadataAndTransferNFT(
           daemon,
           migrationAddress,
-          poolAddress,
+          v3pool1Address,
           metaDataState,
           metaDataDecryptorUrlAndAddress,
           flagsAndData,
@@ -793,10 +768,8 @@ describe('Migration test', () => {
           didV4
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration not completed yet'"
-        )
+        console.log(e.message)
+        assert(e.message == 'Migration not completed yet')
       }
     })
     it('# check current states and advance blocks AFTER deadline', async () => {
@@ -865,10 +838,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Deadline reached for adding shares'"
-        )
+        assert(e.message == 'Deadline reached for adding shares')
       }
 
       expect(
@@ -902,10 +872,7 @@ describe('Migration test', () => {
           shares
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Deadline reached for removing shares'"
-        )
+        assert(e.message === 'Deadline reached for removing shares')
       }
     })
     it('#cancelMigration - should fail to cancel if threshold is MET (AFTER deadline)', async () => {
@@ -916,10 +883,7 @@ describe('Migration test', () => {
           v3pool1Address
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Threshold already met'"
-        )
+        assert(e.message === 'Threshold already met')
       }
     })
 
@@ -1092,10 +1056,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
-        )
+        assert(e.message == 'Adding shares is not currently allowed')
       }
 
       expect(
@@ -1127,10 +1088,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
-        )
+        assert(e.message === 'Current pool status does not allow share removal')
       }
 
       expect(
@@ -1152,8 +1110,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+          e.message === 'Current pool status does not allow to cancel Pool'
         )
       }
     })
@@ -1166,9 +1123,9 @@ describe('Migration test', () => {
           ['1', '1']
         )
       } catch (e) {
+        console.log(e.message)
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+          e.message === 'Current pool status does not allow to liquidate Pool'
         )
       }
     })
@@ -1188,10 +1145,7 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
-        )
+        assert(e.message == 'Migration process has already been started')
       }
     })
 
@@ -1221,10 +1175,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
-        )
+        assert(e.message == 'Adding shares is not currently allowed')
       }
 
       expect(
@@ -1256,10 +1207,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
-        )
+        assert(e.message === 'Current pool status does not allow share removal')
       }
 
       expect(
@@ -1281,8 +1229,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+          e.message === 'Current pool status does not allow to cancel Pool'
         )
       }
     })
@@ -1296,8 +1243,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+          e.message === 'Current pool status does not allow to liquidate Pool'
         )
       }
     })
@@ -1363,10 +1309,7 @@ describe('Migration test', () => {
           ['ERC20name', 'ERC20symbol']
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Migration process has already been started'"
-        )
+        assert(e.message == 'Migration process has already been started')
       }
     })
     it('#addShares -  adding shares not allowed if status != allowed', async () => {
@@ -1395,10 +1338,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ==
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Adding shares is not currently allowed'"
-        )
+        assert(e.message == 'Adding shares is not currently allowed')
       }
 
       expect(
@@ -1430,10 +1370,7 @@ describe('Migration test', () => {
           web3.utils.toWei('50')
         )
       } catch (e) {
-        assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow share removal'"
-        )
+        assert(e.message === 'Current pool status does not allow share removal')
       }
 
       expect(
@@ -1455,8 +1392,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to cancel Pool'"
+          e.message === 'Current pool status does not allow to cancel Pool'
         )
       }
     })
@@ -1470,8 +1406,7 @@ describe('Migration test', () => {
         )
       } catch (e) {
         assert(
-          e.message ===
-            "Returned error: Error: VM Exception while processing transaction: reverted with reason string 'Current pool status does not allow to liquidate Pool'"
+          e.message === 'Current pool status does not allow to liquidate Pool'
         )
       }
     })
