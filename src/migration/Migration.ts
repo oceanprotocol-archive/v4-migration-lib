@@ -4,7 +4,7 @@ import { TransactionReceipt } from 'web3-eth'
 import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
 
 import ERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
-
+import IDataTokenTemplate from '@oceanprotocol/contracts/artifacts/contracts/v3/IDataTokenTemplate.sol/IDataTokenTemplate.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 
@@ -158,6 +158,21 @@ export class Migration {
     return address
   }
 
+  /** Get Migration Owner
+   * @param {String} migrationAddress migration contract address
+   * @param {Contract} migrationContract optional contract instance
+   * @return {Promise<string>} factory address
+   */
+  public async getOwner(
+    migrationAddress: string,
+    contractInstance?: Contract
+  ): Promise<string> {
+    const migrationContract =
+      contractInstance ||
+      new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
+    return await migrationContract.methods.owner().call()
+  }
+
   /** Get Ocean Address
    * @param {String} migrationAddress migration contract address
    * @param {Contract} migrationContract optional contract instance
@@ -280,6 +295,21 @@ export class Migration {
     erc20NameAndSymbol: string[],
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
+    const v3DtContract =
+      contractInstance ||
+      new this.web3.eth.Contract(
+        IDataTokenTemplate.abi as AbiItem[],
+        v3DtAddress
+      )
+
+    if (!(await v3DtContract.methods.isMinter(address).call())) {
+      throw new Error(`Caller is not V3Dt Owner`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '0'
+    ) {
+      throw new Error(`Migration process has already been started`)
+    }
     // Create migration object
     const migrationContract =
       contractInstance ||
@@ -367,6 +397,17 @@ export class Migration {
     lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '1'
+    ) {
+      throw new Error(`Adding shares is not currently allowed`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).deadline <
+      (await this.web3.eth.getBlockNumber()).toString()
+    ) {
+      throw new Error(`Deadline reached for adding shares`)
+    }
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
@@ -441,6 +482,23 @@ export class Migration {
     lptV3Amount: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '1'
+    ) {
+      throw new Error(`Current pool status does not allow share removal`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).deadline <
+      (await this.web3.eth.getBlockNumber()).toString()
+    ) {
+      throw new Error(`Deadline reached for removing shares`)
+    }
+    if (
+      (await this.getShareAllocation(migrationAddress, poolAddressV3, address))
+        .userV3Shares < lptV3Amount
+    ) {
+      throw new Error(`User does not have sufficient shares locked up`)
+    }
     // Create migration object
     const migrationContract =
       contractInstance ||
@@ -532,6 +590,21 @@ export class Migration {
     poolAddressV3: string,
     contractInstance?: Contract
   ): Promise<string> {
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).owner !==
+        address ||
+      (await this.getOwner(migrationAddress)) !== address
+    ) {
+      throw new Error(`Not OPF or DT owner`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '1'
+    ) {
+      throw new Error(`Current pool status does not allow to cancel Pool`)
+    }
+    if (await this.thresholdMet(migrationAddress, poolAddressV3)) {
+      throw new Error(`Threshold already met`)
+    }
     // Create migration object
     const migrationContract =
       contractInstance ||
@@ -606,6 +679,20 @@ export class Migration {
     minAmountsOut: string[],
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '1'
+    ) {
+      throw new Error(`Current pool status does not allow to liquidate Pool`)
+    }
+    if (!(await this.thresholdMet(migrationAddress, poolAddressV3))) {
+      throw new Error(`Threshold not met`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).deadline >
+      (await this.web3.eth.getBlockNumber()).toString()
+    ) {
+      throw new Error(`Cannot be called before deadline`)
+    }
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
@@ -699,7 +786,7 @@ export class Migration {
   public async setMetadataAndTransferNFT(
     address: string,
     migrationAddress: string,
-    poolAddress: string,
+    poolAddressV3: string,
     metaDataState: string,
     metaDataDecryptorUrlAndAddress: string[],
     bytes: string[],
@@ -707,6 +794,14 @@ export class Migration {
     didV4: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
+    if ((await this.getDaemon(migrationAddress)) !== address) {
+      throw new Error(`ONLY OPF DAEMON`)
+    }
+    if (
+      (await this.getPoolStatus(migrationAddress, poolAddressV3)).status !== '2'
+    ) {
+      throw new Error(`Migration not completed yet`)
+    }
     const migrationContract =
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
@@ -714,7 +809,7 @@ export class Migration {
     const estGas = await this.estGasSetMetadataAndTransferNFT(
       address,
       migrationAddress,
-      poolAddress,
+      poolAddressV3,
       metaDataState,
       metaDataDecryptorUrlAndAddress,
       bytes,
@@ -725,7 +820,7 @@ export class Migration {
 
     const trxReceipt = await migrationContract.methods
       .setMetadataAndTransferNFT(
-        poolAddress,
+        poolAddressV3,
         metaDataState,
         metaDataDecryptorUrlAndAddress,
         bytes,

@@ -1,5 +1,6 @@
 import { DDO, DID, Logger } from '@oceanprotocol/lib'
 import axios, { AxiosResponse } from 'axios'
+require('dotenv').config()
 
 export async function getDDO(did: string | DID): Promise<DDO> {
   try {
