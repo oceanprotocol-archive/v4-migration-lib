@@ -8,7 +8,6 @@ test/
 src/
 tsconfig.json
 tslint.json
-squid-js.json
 barge/
 integration/
 plugins/
