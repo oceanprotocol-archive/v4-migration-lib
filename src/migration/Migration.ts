@@ -2,12 +2,14 @@ import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
 import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
-
+import { getAndConvertDDO } from '../DDO/convertDDO'
+import { DDO, DID, Logger } from '@oceanprotocol/lib'
 import ERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
-import IDataTokenTemplate from '@oceanprotocol/contracts/artifacts/contracts/v3/IDataTokenTemplate.sol/IDataTokenTemplate.json'
+import DataTokenTemplate from '@oceanprotocol/v3/artifacts/DataTokenTemplate.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
-
+import { format } from 'path/posix'
+const { sha256 } = require('@ethersproject/sha2')
 /**
  * Pool Info
  */
@@ -298,7 +300,7 @@ export class Migration {
     const v3DtContract =
       contractInstance ||
       new this.web3.eth.Contract(
-        IDataTokenTemplate.abi as AbiItem[],
+        DataTokenTemplate.abi as AbiItem[],
         v3DtAddress
       )
 
@@ -890,5 +892,59 @@ export class Migration {
     return await migrationContract.methods
       .getShareAllocation(poolAddressV3, userAddress)
       .call()
+  }
+
+  /**
+   *
+   * @param {String} address User address
+   * @param {String} migrationAddress V4Migration address
+   * @param {String} poolAddressV3 v4 pool
+   * @param {String} metaDataState metaDataState(0,1,..)
+   * @param {String[]} bytes [flags,data]
+   * @param {Contract} migrationContract optional contract instance
+   * @return {Promise<TransactionReceipt>}
+   */
+  public async migratePoolAsset(
+    address: string,
+    migrationAddress: string,
+    poolAddressV3: string,
+    minAmountsOut: string[],
+    metaDataState: string,
+    //  metaDataDecryptorUrlAndAddress: string[],
+    bytes: string[],
+    //  metaDataHash: string,
+    //  didV4: string,
+    contractInstance?: Contract
+  ): Promise<TransactionReceipt> {
+    let tx = await this.liquidateAndCreatePool(
+      address,
+      migrationAddress,
+      poolAddressV3,
+      minAmountsOut,
+      contractInstance
+    )
+    const didV3 = (await this.getPoolStatus(migrationAddress, poolAddressV3))
+      .didV3
+    // TODO: call provider and get
+    // metaDataDecryptorUrlAndAddress,
+    // metaDataHash,
+
+    // const DDOV4 = await getAndConvertDDO(didV3, 'nftAddress', 'erc20Address')
+    console.log('test')
+    const metaDataDecryptorUrlAndAddress = ['....', '...']
+    const metaDataHash = this.web3.utils.keccak256('METADATA')
+    tx = await this.setMetadataAndTransferNFT(
+      address,
+      migrationAddress,
+      poolAddressV3,
+      metaDataState,
+      metaDataDecryptorUrlAndAddress,
+      bytes,
+      metaDataHash,
+      'DDOV4.id',
+      contractInstance
+    )
+
+    return tx
   }
 }

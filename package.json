@@ -16,7 +16,9 @@
     "test:unit:cover": "nyc --report-dir coverage/unit npm run test:unit",
     "test:integration": "mocha --config=test/integration/.mocharc.json --node-env=test --exit 'test/integration/**/*.test.ts'",
     "test:integration:cover": "nyc --report-dir coverage/integration --no-clean npm run test:integration",
-    "test:migration": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/Migration.test.ts'"
+    "test:migration": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/Migration.test.ts'",
+    "test:ddo": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/ddo.test.ts'",
+    "test:flow": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/flow/FlowMigration.test.ts'"
   },
   "repository": {
     "type": "git",
@@ -29,7 +31,8 @@
   },
   "homepage": "https://github.com/oceanprotocol/v4-migration-lib#readme",
   "dependencies": {
-    "@oceanprotocol/contracts": "1.0.0-alpha.19",
+    "@oceanprotocol/contracts": "1.0.0-alpha.21",
+    "@oceanprotocol/v3": "github:oceanprotocol/contracts",
     "@oceanprotocol/lib": "^0.20.2",
     "axios": "^0.25.0",
     "web3": "^1.3.0",
