@@ -7,7 +7,8 @@ import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 const did1 = 'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38'
 const did2 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
 const did3 = 'did:op:50C48d3eE0Ed47479d3e2599FAe0076965cBD39c'
-
+const nftAddress = 'BD39c'
+const erc20Address = '50C48'
 describe('Imports V3 DDO', () => {
   it('Imports 1st DDO', async () => {
     const ddo1: v3DDO = await getDDO(did1)
@@ -34,14 +35,14 @@ describe('Imports V3 DDO', () => {
 
 describe('Converts V3 DDO to V4 DDO', () => {
   it('Converts 1st DDO', async () => {
-    const ddo1: v4DDO = await getAndConvertDDO(did1)
+    const ddo1: v4DDO = await getAndConvertDDO(did1, nftAddress, erc20Address)
     assert(
       ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
     )
     assert(ddo1.metadata.type === 'dataset')
   })
   it('Converts 2nd DDO', async () => {
-    const ddo2: v4DDO = await getAndConvertDDO(did2)
+    const ddo2: v4DDO = await getAndConvertDDO(did2, nftAddress, erc20Address)
     assert(
       ddo2.metadata.name ===
         'Product Pages of 1’044’709 Products on Amazon.com (processed data)'
@@ -49,7 +50,7 @@ describe('Converts V3 DDO to V4 DDO', () => {
     assert(ddo2.metadata.type === 'dataset')
   })
   it('Converts 3rd DDO', async () => {
-    const ddo3: v4DDO = await getAndConvertDDO(did3)
+    const ddo3: v4DDO = await getAndConvertDDO(did3, nftAddress, erc20Address)
     assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')
     assert(ddo3.metadata.type === 'algorithm')
   })
