@@ -4,8 +4,8 @@ import { TransactionReceipt } from 'web3-eth'
 import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
 import { getAndConvertDDO } from '../DDO/convertDDO'
 import { DDO, DID, Logger } from '@oceanprotocol/lib'
-import ERC20 from '@oceanprotocol/contracts/artifacts/contracts/interfaces/IERC20.sol/IERC20.json'
-import DataTokenTemplate from '@oceanprotocol/v3/artifacts/DataTokenTemplate.json'
+import IERC20 from '../artifacts/IERC20.json'
+import DataTokenTemplate from '../artifacts/DataTokenTemplate.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 import { format } from 'path/posix'
@@ -87,7 +87,7 @@ export class Migration {
   ): Promise<any> {
     const erc20Contract =
       contractInstance ||
-      new this.web3.eth.Contract(ERC20.abi as AbiItem[], erc20Address)
+      new this.web3.eth.Contract(IERC20.abi as AbiItem[], erc20Address)
 
     // Estimate gas cost for mint method
     const gasLimitDefault = this.GASLIMIT_DEFAULT
@@ -122,7 +122,7 @@ export class Migration {
   ): Promise<TransactionReceipt> {
     const erc20Contract =
       contractInstance ||
-      new this.web3.eth.Contract(ERC20.abi as AbiItem[], erc20Address)
+      new this.web3.eth.Contract(IERC20.abi as AbiItem[], erc20Address)
 
     const estGas = await this.estGasApprove(
       address,
@@ -928,6 +928,7 @@ export class Migration {
     // TODO: call provider and get
     // metaDataDecryptorUrlAndAddress,
     // metaDataHash,
+    // https://github.com/oceanprotocol/provider/blob/v4main/API.md
 
     // const DDOV4 = await getAndConvertDDO(didV3, 'nftAddress', 'erc20Address')
     console.log('test')
