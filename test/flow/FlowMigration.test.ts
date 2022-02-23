@@ -14,10 +14,20 @@ import OPFCommunityFeeCollector from './../../src/artifacts/OPFCommunityFeeColle
 import PoolTemplate from './../../src/artifacts/BPool.json'
 import { Provider } from '../../src/provider/Provider'
 import { getAndConvertDDO } from '../../src/DDO/convertDDO'
+import { FileMetadata, DDO } from '../../src/@types'
+import { SHA256 } from 'crypto-js'
+import { getHash } from '../../src/utils'
 import { ZERO_ADDRESS, ONE_ADDRESS } from '../../src/utils/Constants'
 import BN from 'bn.js'
 const web3 = new Web3('http://127.0.0.1:8545')
 const providerUrl = 'http://127.0.0.1:8030'
+const files = [
+  {
+    type: 'url',
+    url: 'https://raw.githubusercontent.com/oceanprotocol/testdatasets/main/shs_dataset_test.txt',
+    method: 'GET'
+  }
+]
 describe('Migration test', () => {
   let v3DtOwner: string
   let user1: string
@@ -266,20 +276,39 @@ describe('Migration test', () => {
       const valid = await providerInstance.isValidProvider(providerUrl)
       assert(valid === true)
 
-      // Pool migration has been completed (index 3)
-      //expect(args.status).to.equal('3')
-
-      // const tokensDetails = await migration.getTokensDetails(
-      //   migrationAddress,
-      //   v3pool1Address
-      // )
       const nft = new web3.eth.Contract(
         ERC721Template.abi as AbiItem[],
         args.nftAddress
       )
 
-      // NFT has been transferred to the owner
-      expect(await nft.methods.ownerOf(1).call()).to.equal(v3DtOwner)
+      // NFT has been transferred to the migration address
+      expect(await nft.methods.ownerOf(1).call()).to.equal(migrationAddress)
+
+      // UNCOMMENT TO SEE THE ISSUE
+      // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
+      // console.log(encryptedFiles)
+      // const poolDdo = { ...ddo1 }
+      // poolDdo.metadata.name = 'test-dataset-pool'
+      // poolDdo.services[0].files = encryptedFiles
+
+      // const chain = await web3.eth.getChainId()
+      // poolDdo.chainId = chain
+      // poolDdo.id =
+      //   'did:op:' +
+      //   SHA256(
+      //     web3.utils.toChecksumAddress(args.nftAddress) + chain.toString(10)
+      //   )
+
+      // // const AssetValidation: ValidateMetadata = await aquarius.validate(poolDdo)
+      // // assert(AssetValidation.valid === true, 'Published asset is not valid')
+
+      // const encryptedDdo = await providerInstance.encrypt(poolDdo, providerUrl)
+
+      // const metadataHash = getHash(JSON.stringify(poolDdo))
+
+      // // assert(AssetValidation.hash === '0x' + metadataHash, 'Metadata hash is a missmatch')
+      // console.log(encryptedDdo, 'encryptedDDO boom')
+      // console.log(metadataHash, 'metadataHash boom')
     })
   })
 })
