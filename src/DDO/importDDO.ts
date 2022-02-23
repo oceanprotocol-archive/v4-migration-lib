@@ -5,8 +5,9 @@ require('dotenv').config()
 export async function getDDO(did: string | DID): Promise<DDO> {
   try {
     const metadataCacheUri = process.env.METADATACACHE_URI
+    console.log(metadataCacheUri)
     const response: AxiosResponse<DDO> = await axios.get(
-      `${metadataCacheUri}/api/aquarius/assets/ddo/${did}`
+      `${metadataCacheUri}/api/v1/aquarius/assets/ddo/${did}`
     )
     if (!response || response.status !== 200 || !response.data) return
 

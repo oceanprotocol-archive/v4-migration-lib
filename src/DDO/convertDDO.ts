@@ -53,7 +53,7 @@ export async function getAndConvertDDO(
   erc20Address: string
 ): Promise<v4DDO> {
   const v3DDO: v3DDO = await getDDO(did)
-
+  console.log(v3DDO)
   const v4DDO: v4DDO = await convertDDO(did, v3DDO, nftAddress, erc20Address)
 
   return v4DDO

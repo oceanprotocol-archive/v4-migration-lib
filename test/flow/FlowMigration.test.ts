@@ -12,10 +12,12 @@ import ERC20Template from './../../src/artifacts/ERC20Template.json'
 import FixedRate from './../../src/artifacts/FixedRateExchange.json'
 import OPFCommunityFeeCollector from './../../src/artifacts/OPFCommunityFeeCollector.json'
 import PoolTemplate from './../../src/artifacts/BPool.json'
+import { Provider } from '../../src/provider/Provider'
+import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 import { ZERO_ADDRESS, ONE_ADDRESS } from '../../src/utils/Constants'
 import BN from 'bn.js'
 const web3 = new Web3('http://127.0.0.1:8545')
-
+const providerUrl = 'http://127.0.0.1:8030'
 describe('Migration test', () => {
   let v3DtOwner: string
   let user1: string
@@ -238,29 +240,42 @@ describe('Migration test', () => {
       ]
       const metaDataState = '1'
 
-      const txReceipt = await migration.migratePoolAsset(
+      const txReceipt = await migration.liquidateAndCreatePool(
         daemon,
         migrationAddress,
         v3pool1Address,
-        ['1', '1'],
-        metaDataState,
-        flagsAndData
+        ['1', '1']
       )
       console.log(txReceipt)
-      // assert(txReceipt.events.Completed.event === 'Completed')
-      // const args = txReceipt.events.Completed.returnValues
-
-      // expect(args.poolAddress).to.equal(v3pool1Address)
-      // // Pool migration has been completed (index 3)
-      // expect(args.status).to.equal('3')
-
-      const tokensDetails = await migration.getTokensDetails(
-        migrationAddress,
-        v3pool1Address
+      assert(txReceipt.events.NewPool.event === 'NewPool')
+      const args = txReceipt.events.NewPool.returnValues
+      console.log(args)
+      const did1 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
+      const ddo1 = await getAndConvertDDO(
+        did1,
+        args.nftAddress,
+        args.newDTAddress
       )
+      console.log(ddo1)
+      // assert(
+      //   ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
+      // )
+      // assert(ddo1.metadata.type === 'dataset')
+
+      const providerInstance = new Provider()
+      const valid = await providerInstance.isValidProvider(providerUrl)
+      assert(valid === true)
+
+      // Pool migration has been completed (index 3)
+      //expect(args.status).to.equal('3')
+
+      // const tokensDetails = await migration.getTokensDetails(
+      //   migrationAddress,
+      //   v3pool1Address
+      // )
       const nft = new web3.eth.Contract(
         ERC721Template.abi as AbiItem[],
-        tokensDetails.erc721Address
+        args.nftAddress
       )
 
       // NFT has been transferred to the owner

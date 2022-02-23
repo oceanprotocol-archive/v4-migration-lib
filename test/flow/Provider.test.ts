@@ -4,6 +4,7 @@ import { FileMetadata, DDO } from '../../src/@types'
 import { SHA256 } from 'crypto-js'
 import { getHash } from '../../src/utils'
 import Web3 from 'web3'
+import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 const web3 = new Web3('http://127.0.0.1:8545')
 const files = [
   {
@@ -42,16 +43,16 @@ const genericAsset: DDO = {
     }
   ]
 }
-const providerUrl = 'http://127.0.0.1:8030'
+const providerUrl = 'https://provider.mainnet.oceanprotocol.com'
 const sampleNFTAddress = '0xa15024b732A8f2146423D14209eFd074e61964F3'
 const sampleDTAddress = '0xa15024b732A8f2146423D14209eFd074e61964F3'
+const did2 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
 describe('Provider tests', () => {
   let providerInstance: Provider
-
+  let ddo2
   it('Initialize Ocean', async () => {
     providerInstance = new Provider()
   })
-
   it('Alice tests invalid provider', async () => {
     const valid = await providerInstance.isValidProvider('http://example.net')
     assert(valid === false)
@@ -65,20 +66,29 @@ describe('Provider tests', () => {
   it('Alice checks fileinfo', async () => {
     const fileinfo: FileMetadata[] = await providerInstance.checkFileUrl(
       'https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-abstract.xml.gz-rss.xml',
-      'http://127.0.0.1:8030'
+      'https://provider.mainnet.oceanprotocol.com'
     )
     assert(fileinfo[0].valid === true, 'Sent file is not valid')
+  })
+
+  it('Converts DDO', async () => {
+    ddo2 = await getAndConvertDDO(did2, sampleNFTAddress, sampleDTAddress)
+    assert(
+      ddo2.metadata.name ===
+        'Product Pages of 1’044’709 Products on Amazon.com (processed data)'
+    )
+    assert(ddo2.metadata.type === 'dataset')
   })
 
   it('Alice encrypts files and sign message', async () => {
     const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
     console.log(encryptedFiles)
-    const poolDdo: DDO = { ...genericAsset }
+    const poolDdo = ddo2
     poolDdo.metadata.name = 'test-dataset-pool'
     poolDdo.services[0].files = encryptedFiles
-    poolDdo.services[0].datatokenAddress = sampleDTAddress
+    //poolDdo.services[0].datatokenAddress = sampleDTAddress
 
-    poolDdo.nftAddress = sampleNFTAddress
+    // poolDdo.nftAddress = sampleNFTAddress
     const chain = await web3.eth.getChainId()
     poolDdo.chainId = chain
     poolDdo.id =
