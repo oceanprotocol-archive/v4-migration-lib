@@ -2,18 +2,23 @@ import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import { TransactionReceipt } from 'web3-eth'
 import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
-import { getAndConvertDDO } from '../DDO/convertDDO'
+import { convertDDO, getAndConvertDDO } from '../DDO/convertDDO'
 import { DDO } from '../DDO/ddoV3/DDO'
 import IERC20 from '../artifacts/IERC20.json'
 import DataTokenTemplate from '../artifacts/DataTokenTemplate.json'
 import { getFairGasPrice } from '../utils'
 import { Contract } from 'web3-eth-contract'
 import { format } from 'path/posix'
-const { sha256 } = require('@ethersproject/sha2')
+import sha256 from 'crypto-js/sha256'
 import ERC721Template from './../../src/artifacts/ERC721Template.json'
-import { Provider } from '../provider'
+import { Provider, ServiceEndpoint } from '../provider'
 import { SHA256 } from 'crypto-js'
 import axios, { AxiosResponse } from 'axios'
+import { getDDO } from '../DDO/importDDO'
+import { DDO as v3DDO } from '../DDO/ddoV3/DDO'
+import { DDO as v4DDO } from '../@types/DDO/DDO'
+import fetch from 'cross-fetch'
+import { assert } from 'chai'
 
 /**
  * Pool Info
@@ -813,18 +818,19 @@ export class Migration {
       contractInstance ||
       new this.web3.eth.Contract(this.migrationAbi, migrationAddress)
 
-    const estGas = await this.estGasSetMetadataAndTransferNFT(
-      address,
-      migrationAddress,
-      poolAddressV3,
-      metaDataState,
-      metaDataDecryptorUrlAndAddress,
-      bytes,
-      metaDataHash,
-      didV4,
-      migrationContract
-    )
+    // const estGas = await this.estGasSetMetadataAndTransferNFT(
+    //   address,
+    //   migrationAddress,
+    //   poolAddressV3,
+    //   metaDataState,
+    //   metaDataDecryptorUrlAndAddress,
+    //   bytes,
+    //   metaDataHash,
+    //   didV4,
+    //   migrationContract
+    // )
 
+    const fairGasPrice = await getFairGasPrice(this.web3)
     const trxReceipt = await migrationContract.methods
       .setMetadataAndTransferNFT(
         poolAddressV3,
@@ -836,7 +842,7 @@ export class Migration {
       )
       .send({
         from: address,
-        gas: estGas + 1,
+        gas: 3_000_000 + 1,
         gasPrice: await getFairGasPrice(this.web3)
       })
 
@@ -960,7 +966,7 @@ export class Migration {
     return `did:op:${checksum.toString()}`
   }
 
-  public async validateAssetAquarius(asset: any): Promise<any> {
+  public async validateAssetAquariusV4(asset: any): Promise<any> {
     const metadataCacheUri =
       process.env.METADATACACHEV4_URI || 'https://v4.aquarius.oceanprotocol.com'
 
@@ -979,6 +985,78 @@ export class Migration {
     if (!response || response.status !== 200 || !response.data) return false
 
     return response.data?.providerAddress
+  }
+
+  /**
+   * Returns the service endpoints that exist in provider.
+   * @param {any} endpoints
+   * @return {Promise<ServiceEndpoint[]>}
+   */
+  public async getServiceEndpoints(providerEndpoint: string, endpoints: any) {
+    const serviceEndpoints: ServiceEndpoint[] = []
+
+    for (const i in endpoints.serviceEndpoints) {
+      const endpoint: ServiceEndpoint = {
+        serviceName: i,
+        method: endpoints.serviceEndpoints[i][0],
+        urlPath: providerEndpoint + endpoints.serviceEndpoints[i][1]
+      }
+      serviceEndpoints.push(endpoint)
+    }
+    return serviceEndpoints
+  }
+
+  getEndpointURL(
+    servicesEndpoints: ServiceEndpoint[],
+    serviceName: string
+  ): ServiceEndpoint {
+    if (!servicesEndpoints) return null
+    return servicesEndpoints.find(
+      (s) => s.serviceName === serviceName
+    ) as ServiceEndpoint
+  }
+
+  /** Encrypt data using the Provider's own symmetric key
+   * @param {string} data data in json format that needs to be sent , it can either be a DDO or a File array
+   * @param {string} providerUri provider uri address
+   * @param {AbortSignal} signal abort signal
+   * @return {Promise<string>} urlDetails
+   */
+  public async encryptV4(
+    data: any,
+    providerUri: string = 'https://v4.provider.rinkeby.oceanprotocol.com/',
+    signal?: AbortSignal
+  ): Promise<string> {
+    const providerEndpoints = await axios.get(providerUri, {
+      headers: {
+        'Content-type': 'application/json'
+      }
+    })
+
+    const serviceEndpoints = await this.getServiceEndpoints(
+      providerUri,
+      providerEndpoints.data
+    )
+    const path = this.getEndpointURL(serviceEndpoints, 'encrypt')
+      ? this.getEndpointURL(serviceEndpoints, 'encrypt').urlPath
+      : null
+
+    if (!path) return null
+    try {
+      const response = await axios.post(path, decodeURI(JSON.stringify(data)), {
+        headers: {
+          'Content-Type': 'application/octet-stream'
+        }
+      })
+      return response.data
+    } catch (e) {
+      console.error(e)
+      throw new Error('HTTP request failed')
+    }
+  }
+
+  public getHash(data: any): string {
+    return sha256(data).toString()
   }
 
   /**
@@ -1009,20 +1087,26 @@ export class Migration {
 
     const providerUrl = 'https://v4.provider.rinkeby.oceanprotocol.com/' // 'http://127.0.0.1:8030'
 
+    const poolV3Address = '0xb53851Dca24eA9B561a616D8dc85f31030c0f347'
+
     const providerV4Address = await this.getProviderV4Address(providerUrl)
 
-    const { v3DDO, v4DDO } = await getAndConvertDDO(
+    const v3DDO: v3DDO = await getDDO(oldDid)
+
+    const v4DDO: v4DDO = await convertDDO(
       oldDid,
+      v3DDO,
       nftAddress,
       newDTAddress
     )
+
     const providerInstance = new Provider()
 
     // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
 
     console.log('NEW DDO', v4DDO)
 
-    const oldEncryptedFiles = v3DDO.service[0].attributes.encryptedFiles
+    const oldEncryptedFiles = ''
 
     const valid = await providerInstance.isValidProvider(providerUrl)
 
@@ -1038,67 +1122,37 @@ export class Migration {
     // console.log(encryptedFiles)
 
     const poolDdo = { ...v4DDO }
-    poolDdo.metadata.name = 'test-dataset-pool'
+    // poolDdo.metadata.name = 'test-dataset-pool'
     poolDdo.services[0].files = oldEncryptedFiles
 
     poolDdo.chainId = chainId
 
     poolDdo.id = this.generateDidv4(nftAddress, chainId)
 
-    const validation = await this.validateAssetAquarius(poolDdo)
+    const validation = await this.validateAssetAquariusV4(poolDdo)
 
     const metaDataDecryptorUrlAndAddress = [providerUrl, providerV4Address]
 
-    const metaDataHash = this.web3.utils.keccak256('METADATA')
+    const encryptedDdo = await this.encryptV4(poolDdo, providerUrl)
 
-    // tx = await this.setMetadataAndTransferNFT(
-    //   address,
-    //   migrationAddress,
-    //   poolAddressV3,
-    //   metaDataState,
-    //   metaDataDecryptorUrlAndAddress,
-    //   bytes,
-    //   metaDataHash,
-    //   'DDOV4.id',
-    //   contractInstance
-    // )
+    const metadataHash = this.getHash(JSON.stringify(poolDdo))
 
-    // return tx
+    assert(
+      validation.hash === '0x' + metadataHash,
+      'Metadata hash is a missmatch'
+    )
 
-    // const args = txReceipt.events.NewPool.returnValues
-    // console.log(args)
+    const tx = await this.setMetadataAndTransferNFT(
+      '0xE75fa34968323219f4664080103746a605d18A47',
+      migrationAddress,
+      poolV3Address,
+      '0',
+      metaDataDecryptorUrlAndAddress,
+      ['0x2', encryptedDdo],
+      metadataHash,
+      poolDdo.id
+    )
 
-    // let tx = await this.liquidateAndCreatePool(
-    //   address,
-    //   migrationAddress,
-    //   poolAddressV3,
-    //   minAmountsOut,
-    //   contractInstance
-    // )
-
-    // const didV3 = (await this.getPoolStatus(migrationAddress, poolAddressV3))
-    //   .didV3
-    // TODO: call provider and get
-    // metaDataDecryptorUrlAndAddress,
-    // metaDataHash,
-    // https://github.com/oceanprotocol/provider/blob/v4main/API.md
-
-    // const DDOV4 = await getAndConvertDDO(didV3, 'nftAddress', 'erc20Address')
-    // console.log('test')
-    // const metaDataDecryptorUrlAndAddress = ['....', '...']
-    // const metaDataHash = this.web3.utils.keccak256('METADATA')
-    // tx = await this.setMetadataAndTransferNFT(
-    //   address,
-    //   migrationAddress,
-    //   poolAddressV3,
-    //   metaDataState,
-    //   metaDataDecryptorUrlAndAddress,
-    //   bytes,
-    //   metaDataHash,
-    //   'DDOV4.id',
-    //   contractInstance
-    // )
-
-    // return tx
+    return tx
   }
 }

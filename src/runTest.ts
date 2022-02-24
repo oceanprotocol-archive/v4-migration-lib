@@ -8,9 +8,7 @@ const run = async () => {
 
   const web3 = new Web3(provider)
 
-  const account = web3.eth.accounts.privateKeyToAccount(
-    'e18d2dfabac99eba4fa0b68abae16e1e261fd7e15d95d5a4f1637caa608cdb49'
-  )
+  const account = web3.eth.accounts.privateKeyToAccount('')
   web3.eth.accounts.wallet.add(account)
 
   const migration = new Migration(web3)
