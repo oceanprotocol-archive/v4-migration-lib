@@ -131,6 +131,7 @@ export class Provider {
     accountId: string,
     message: string
   ): Promise<string> {
+    //  console.log(web3, accountId, message)
     const signature = await signWithHash(web3, message, accountId)
     return signature
   }

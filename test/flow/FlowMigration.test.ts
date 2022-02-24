@@ -14,10 +14,12 @@ import OPFCommunityFeeCollector from './../../src/artifacts/OPFCommunityFeeColle
 import PoolTemplate from './../../src/artifacts/BPool.json'
 import { Provider } from '../../src/provider/Provider'
 import { getAndConvertDDO } from '../../src/DDO/convertDDO'
+import axios, { AxiosResponse } from 'axios'
 import { FileMetadata, DDO } from '../../src/@types'
-import { getHash } from '../../src/utils'
+import { getHash, noZeroX } from '../../src/utils'
 import { ZERO_ADDRESS, ONE_ADDRESS } from '../../src/utils/Constants'
 import BN from 'bn.js'
+import { getDDO } from '../../src/DDO/importDDO'
 const web3 = new Web3('http://127.0.0.1:8545')
 const providerUrl = 'http://127.0.0.1:8030'
 
@@ -28,6 +30,36 @@ const files = [
     method: 'GET'
   }
 ]
+const genericAsset = {
+  '@context': ['https://w3id.org/did/v1'],
+  id: 'testFakeDid',
+  version: '4.0.0',
+  chainId: 4,
+  nftAddress: '0x0',
+  metadata: {
+    created: '2021-12-20T14:35:20Z',
+    updated: '2021-12-20T14:35:20Z',
+    name: 'dataset-name',
+    type: 'dataset',
+    description: 'Ocean protocol test dataset description',
+    author: 'oceanprotocol-team',
+    license: 'MIT',
+    tags: ['white-papers'],
+    additionalInformation: { 'test-key': 'test-value' },
+    links: ['http://data.ceda.ac.uk/badc/ukcp09/']
+  },
+  services: [
+    {
+      id: 'testFakeId',
+      type: 'access',
+      description: 'Download service',
+      files: '',
+      datatokenAddress: '0xa15024b732A8f2146423D14209eFd074e61964F3',
+      serviceEndpoint: 'https://providerv4.rinkeby.oceanprotocol.com',
+      timeout: '0'
+    }
+  ]
+}
 describe('Migration test', () => {
   let v3DtOwner: string
   let user1: string
@@ -266,7 +298,8 @@ describe('Migration test', () => {
         args.nftAddress,
         args.newDTAddress
       )
-      console.log(ddo1)
+      const ddoTest = await getDDO(did1)
+      console.log(ddoTest)
       // assert(
       //   ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
       // )
@@ -284,6 +317,35 @@ describe('Migration test', () => {
       // NFT has been transferred to the migration address
       expect(await nft.methods.ownerOf(1).call()).to.equal(migrationAddress)
 
+      let signatureMessage = did1
+      // console.log(ddoTest)
+      // console.log(ddoTest.id)
+      const signature = await providerInstance.createHashSignature(
+        web3,
+        v3DtOwner,
+        signatureMessage
+      )
+
+      const payload = Object()
+      payload.documentId = noZeroX(did1)
+      payload.signature = signature
+      payload.publisherAddress = v3DtOwner
+      payload.nonce = '10'
+      payload.serviceId = ddoTest.service[0].attributes.main.type
+
+      const providerEndpoints = await axios.get(
+        'http://127.0.0.1:8030/api/v1/services/assetUrls',
+        {
+          headers: {
+            'Content-type': 'application/json'
+          },
+          params: {
+            payload
+          }
+        }
+      )
+      console.log(providerEndpoints)
+      //console.log('payload', payload)
       // UNCOMMENT TO SEE THE ISSUE
       // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
       // console.log(encryptedFiles)

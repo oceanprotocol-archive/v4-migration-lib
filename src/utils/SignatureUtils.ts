@@ -49,6 +49,7 @@ export async function signWithHash(
   const isMetaMask =
     web3 && web3.currentProvider && (web3.currentProvider as any).isMetaMask
   try {
+    //console.log('attemp to sign', hash, publicKey, password)
     return await web3.eth.personal.sign(hash, publicKey, password)
   } catch (e) {
     if (isMetaMask) {
@@ -57,6 +58,7 @@ export async function signWithHash(
     console.warn('Error on personal sign.')
     console.warn(e)
     try {
+      console.log('attemp to sign2', hash, publicKey)
       return await web3.eth.sign(hash, publicKey)
     } catch (e2) {
       console.error('Error on sign.')

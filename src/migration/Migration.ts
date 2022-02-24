@@ -6,7 +6,7 @@ import { convertDDO, getAndConvertDDO } from '../DDO/convertDDO'
 import { DDO } from '../DDO/ddoV3/DDO'
 import IERC20 from '../artifacts/IERC20.json'
 import DataTokenTemplate from '../artifacts/DataTokenTemplate.json'
-import { getFairGasPrice } from '../utils'
+import { getFairGasPrice, getHash, noZeroX } from '../utils'
 import { Contract } from 'web3-eth-contract'
 import { format } from 'path/posix'
 import sha256 from 'crypto-js/sha256'
@@ -1069,7 +1069,10 @@ export class Migration {
    * @param {Contract} migrationContract optional contract instance
    * @return {Promise<TransactionReceipt>}
    */
-  public async migratePoolAssetTest() /* : Promise<TransactionReceipt> */ {
+  public async migratePoolAssetTest(
+    web3,
+    address
+  ) /* : Promise<TransactionReceipt> */ {
     // contractInstance?: Contract //  didV4: string, //  metaDataHash: string, // bytes: string[], //  metaDataDecryptorUrlAndAddress: string[], // metaDataState: string // minAmountsOut: string[], // poolAddressV3: string, // migrationAddress: string, // address: string,
     const txHash =
       '0x7ad8f180d0d149c687b98cffa9e5e367b40f34dde4d2dc7d51f630476e869aaa'
@@ -1117,6 +1120,53 @@ export class Migration {
 
     const nftOwner = await nft.methods.ownerOf(1).call()
 
+    const providerUri = 'https://provider.rinkeby.oceanprotocol.com/'
+
+    const providerEndpoints = await providerInstance.getEndpoints(providerUri)
+    const serviceEndpoints = await providerInstance.getServiceEndpoints(
+      providerUri,
+      providerEndpoints
+    )
+
+    let signal = undefined
+    const nonce = await providerInstance.getNonce(
+      providerUri,
+      address
+      // signal,
+      // providerEndpoints,
+      // serviceEndpoints
+    )
+    // /console.log(nonce, 'nonce')
+    let signatureMessage = oldDid
+    signatureMessage += nonce
+    // console.log(ddoTest)
+    // console.log(ddoTest.id)
+    const signature = await providerInstance.createHashSignature(
+      web3,
+      address,
+      signatureMessage
+    )
+
+    const payload = Object()
+    payload.documentId = oldDid
+    payload.signature = signature
+    payload.publisherAddress = address
+    payload.nonce = nonce
+    payload.serviceId = v3DDO.service[0].attributes.main.type
+    //console.log(payload)
+
+    const getV3Url = await axios.get(
+      'https://provider.rinkeby.oceanprotocol.com/api/v1/services/assetUrls',
+      {
+        headers: {
+          'Content-type': 'application/json'
+        },
+        params: payload
+      }
+    )
+    // console.log(getV3Url, 'response')
+    // TODO: get v3 files and encrypt them
+    const files = {}
     // const encryptedFiles = await providerInstance.encrypt('files', providerUrl)
 
     // console.log(encryptedFiles)
