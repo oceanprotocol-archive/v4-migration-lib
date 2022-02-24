@@ -15,12 +15,12 @@ import PoolTemplate from './../../src/artifacts/BPool.json'
 import { Provider } from '../../src/provider/Provider'
 import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 import { FileMetadata, DDO } from '../../src/@types'
-import { SHA256 } from 'crypto-js'
 import { getHash } from '../../src/utils'
 import { ZERO_ADDRESS, ONE_ADDRESS } from '../../src/utils/Constants'
 import BN from 'bn.js'
 const web3 = new Web3('http://127.0.0.1:8545')
 const providerUrl = 'http://127.0.0.1:8030'
+
 const files = [
   {
     type: 'url',
@@ -292,7 +292,6 @@ describe('Migration test', () => {
       // poolDdo.services[0].files = encryptedFiles
 
       // const chain = await web3.eth.getChainId()
-      // poolDdo.chainId = chain
       // poolDdo.id =
       //   'did:op:' +
       //   SHA256(

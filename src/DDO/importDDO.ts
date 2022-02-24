@@ -1,10 +1,11 @@
-import { DDO, DID, Logger } from '@oceanprotocol/lib'
+import { DDO } from './ddoV3/DDO'
 import axios, { AxiosResponse } from 'axios'
 require('dotenv').config()
 
-export async function getDDO(did: string | DID): Promise<DDO> {
+export async function getDDO(did: string): Promise<DDO> {
   try {
-    const metadataCacheUri = process.env.METADATACACHE_URI
+    const metadataCacheUri =
+      process.env.METADATACACHE_URI || 'https://aquarius.oceanprotocol.com'
     console.log(metadataCacheUri)
     const response: AxiosResponse<DDO> = await axios.get(
       `${metadataCacheUri}/api/v1/aquarius/assets/ddo/${did}`
@@ -15,9 +16,9 @@ export async function getDDO(did: string | DID): Promise<DDO> {
     return new DDO(data)
   } catch (error) {
     if (axios.isCancel(error)) {
-      Logger.log(error.message)
+      console.log(error.message)
     } else {
-      Logger.error(error.message)
+      console.error(error.message)
     }
   }
 }
