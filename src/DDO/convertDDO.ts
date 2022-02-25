@@ -37,7 +37,8 @@ export async function convertDDO(
   did: string,
   v3DDO: v3DDO,
   nftAddress: string,
-  erc20Address: string
+  erc20Address: string,
+  providerUrl: string
 ): Promise<v4DDO> {
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
   // TODO: complete with nft erc20etc
@@ -70,7 +71,7 @@ export async function convertDDO(
         type: v3DDO.service[0].attributes.main.type,
         files: '',
         datatokenAddress: erc20Address,
-        serviceEndpoint: v3DDO.service[1].serviceEndpoint,
+        serviceEndpoint: providerUrl,
         timeout: v3DDO.service[1].attributes.main.timeout
       }
     ]
@@ -82,9 +83,16 @@ export async function convertDDO(
 export async function getAndConvertDDO(
   did: string,
   nftAddress: string,
-  erc20Address: string
+  erc20Address: string,
+  providerUrl: string
 ): Promise<{ v3DDO; v4DDO }> {
   const v3DDO: v3DDO = await getDDO(did)
-  const v4DDO: v4DDO = await convertDDO(did, v3DDO, nftAddress, erc20Address)
+  const v4DDO: v4DDO = await convertDDO(
+    did,
+    v3DDO,
+    nftAddress,
+    erc20Address,
+    providerUrl
+  )
   return { v3DDO, v4DDO }
 }
