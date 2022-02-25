@@ -1107,7 +1107,7 @@ export class Migration {
 
     // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
 
-    console.log('NEW DDO', v4DDO)
+    // console.log('NEW DDO', v4DDO)
 
     const oldEncryptedFiles = ''
 
@@ -1122,23 +1122,12 @@ export class Migration {
 
     const providerUri = 'https://provider.rinkeby.oceanprotocol.com/'
 
-    const providerEndpoints = await providerInstance.getEndpoints(providerUri)
-    const serviceEndpoints = await providerInstance.getServiceEndpoints(
-      providerUri,
-      providerEndpoints
-    )
-
-    let signal = undefined
-    const nonce = await providerInstance.getNonce(
-      providerUri,
-      address
-      // signal,
-      // providerEndpoints,
-      // serviceEndpoints
-    )
-    // /console.log(nonce, 'nonce')
+    let signal = null
+    const nonce = await providerInstance.getNonce(providerUri, address)
+    console.log(nonce, 'nonce')
     let signatureMessage = oldDid
     signatureMessage += nonce
+    //signatureMessage += providerUri
     // console.log(ddoTest)
     // console.log(ddoTest.id)
     const signature = await providerInstance.createHashSignature(
@@ -1153,23 +1142,24 @@ export class Migration {
     payload.publisherAddress = address
     payload.nonce = nonce
     payload.serviceId = v3DDO.service[0].attributes.main.type
-    //console.log(payload)
+    console.log(payload)
 
-    const getV3Url = await axios.get(
-      'https://provider.rinkeby.oceanprotocol.com/api/v1/services/assetUrls',
-      {
-        headers: {
-          'Content-type': 'application/json'
-        },
-        params: payload
-      }
-    )
-    // console.log(getV3Url, 'response')
+    // const getV3Url = await axios.get(
+    //   'https://provider.rinkeby.oceanprotocol.com/api/v1/services/assetUrls',
+    //   {
+    //     headers: {
+    //       'Content-type': 'application/json'
+    //     },
+    //     params: payload
+    //   }
+    // )
+    // console.log(getV3Url.data.args)
+    //console.log(getV3Url, 'response')
     // TODO: get v3 files and encrypt them
-    const files = {}
-    // const encryptedFiles = await providerInstance.encrypt('files', providerUrl)
+    //const files = {}
+    const encryptedFiles = await providerInstance.encrypt('files', providerUrl)
 
-    // console.log(encryptedFiles)
+    console.log(encryptedFiles)
 
     const poolDdo = { ...v4DDO }
     // poolDdo.metadata.name = 'test-dataset-pool'
