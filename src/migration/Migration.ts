@@ -18,6 +18,7 @@ import axios, { AxiosResponse } from 'axios'
 import { getDDO } from '../DDO/importDDO'
 import { DDO as v3DDO } from '../DDO/ddoV3/DDO'
 import { DDO as v4DDO } from '../@types/DDO/DDO'
+import { query } from 'express'
 
 /**
  * Pool Info
@@ -1113,6 +1114,14 @@ export class Migration {
     }
   }
 
+  public async getAssetUrl(args: any) {
+    const response: AxiosResponse<DDO> = await axios.get(
+      `https://provider.rinkeby.oceanprotocol.com/api/v1/services/assetUrls`,
+      { params: args, headers: { 'Content-Type': 'application/json' } }
+    )
+    return response.data
+  }
+
   public getHash(data: any): string {
     return sha256(data).toString()
   }
@@ -1167,15 +1176,21 @@ export class Migration {
       '0xE75fa34968323219f4664080103746a605d18A47'
     )
 
-    // const message = `${oldDdo}${nonce}`
-    const message = oldDdo
+    const did = `did:op:${oldDdo.replace('0x', '')}`
 
-    const signedMessage = await this.web3.eth.accounts.sign(
-      message,
-      'e18d2dfabac99eba4fa0b68abae16e1e261fd7e15d95d5a4f1637caa608cdb49'
-    )
+    const message = `${did}${nonce}`
+    // const message = oldDdo
+
+    const signedMessage = await this.web3.eth.sign(message, address)
 
     // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
+
+    const url = await this.getAssetUrl({
+      documentId: did,
+      serviceId: '1',
+      publisherAddress: address,
+      signature: signedMessage
+    })
 
     console.log('NEW DDO', v4DDO)
 
