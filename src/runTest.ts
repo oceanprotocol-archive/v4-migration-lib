@@ -15,14 +15,14 @@ const run = async () => {
 
   const migration = new Migration(web3)
 
-  // await migration.migratePoolAssetTest()
+  await migration.migratePoolAssetTest()
 
-  await migration.runMigration(
-    '0xE75fa34968323219f4664080103746a605d18A47',
-    '0x4f5664c1b6e689FA6aEfcc34e56841eB81E5C0d8',
-    '0xf4fa3cb8498c42fc308b86619c07b7a24d479bb0',
-    ['1', '1']
-  )
+  // await migration.runMigration(
+  //   '0xE75fa34968323219f4664080103746a605d18A47',
+  //   '0x4f5664c1b6e689FA6aEfcc34e56841eB81E5C0d8',
+  //   '0xf4fa3cb8498c42fc308b86619c07b7a24d479bb0',
+  //   ['1', '1']
+  // )
 }
 
 run()

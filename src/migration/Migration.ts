@@ -1162,6 +1162,19 @@ export class Migration {
 
     const providerInstance = new Provider()
 
+    const nonce = await providerInstance.getNonce(
+      'https://provider.rinkeby.oceanprotocol.com/',
+      '0xE75fa34968323219f4664080103746a605d18A47'
+    )
+
+    // const message = `${oldDdo}${nonce}`
+    const message = oldDdo
+
+    const signedMessage = await this.web3.eth.accounts.sign(
+      message,
+      'e18d2dfabac99eba4fa0b68abae16e1e261fd7e15d95d5a4f1637caa608cdb49'
+    )
+
     // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
 
     console.log('NEW DDO', v4DDO)
