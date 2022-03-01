@@ -1,24 +1,21 @@
-import Web3 from 'web3'
-import { AbiItem } from 'web3-utils'
-import { TransactionReceipt } from 'web3-eth'
-import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
-import { abi as Erc721TemplateAbi } from './../artifacts/ERC721Template.json'
-import { convertDDO, getAndConvertDDO } from '../DDO/convertDDO'
-import { DDO } from '../DDO/ddoV3/DDO'
-import IERC20 from '../artifacts/IERC20.json'
-import DataTokenTemplate from '../artifacts/DataTokenTemplate.json'
-import { getFairGasPrice } from '../utils'
-import { Contract } from 'web3-eth-contract'
-import { format } from 'path/posix'
-import sha256 from 'crypto-js/sha256'
-import ERC721Template from './../../src/artifacts/ERC721Template.json'
-import { Provider, ServiceEndpoint } from '../provider'
-import { SHA256 } from 'crypto-js'
 import axios, { AxiosResponse } from 'axios'
-import { getDDO } from '../DDO/importDDO'
-import { DDO as v3DDO } from '../DDO/ddoV3/DDO'
+import { SHA256 } from 'crypto-js'
+import sha256 from 'crypto-js/sha256'
+import Web3 from 'web3'
+import { TransactionReceipt } from 'web3-eth'
+import { Contract } from 'web3-eth-contract'
+import { AbiItem } from 'web3-utils'
 import { DDO as v4DDO } from '../@types/DDO/DDO'
-import { query } from 'express'
+import DataTokenTemplate from '../artifacts/DataTokenTemplate.json'
+import IERC20 from '../artifacts/IERC20.json'
+import { convertDDO } from '../DDO/convertDDO'
+import { DDO, DDO as v3DDO } from '../DDO/ddoV3/DDO'
+import { getDDO } from '../DDO/importDDO'
+import { Provider, ServiceEndpoint } from '../provider'
+import { getFairGasPrice } from '../utils'
+import ERC721Template from './../../src/artifacts/ERC721Template.json'
+import { abi as Erc721TemplateAbi } from './../artifacts/ERC721Template.json'
+import { abi as MigrationAbi } from './../artifacts/V4Migration.json'
 
 /**
  * Pool Info
@@ -1089,7 +1086,7 @@ export class Migration {
    */
   public async encryptV4(
     data: any,
-    providerUri: string = 'https://v4.provider.rinkeby.oceanprotocol.com/',
+    providerUri = 'https://v4.provider.rinkeby.oceanprotocol.com/',
     signal?: AbortSignal
   ): Promise<string> {
     const providerEndpoints = await axios.get(providerUri, {
@@ -1143,12 +1140,12 @@ export class Migration {
    * @return {Promise<TransactionReceipt>}
    */
   public async migratePoolAssetTest(
-    address: string = '0xE75fa34968323219f4664080103746a605d18A47',
-    migrationAddress: string = '0x4f5664c1b6e689FA6aEfcc34e56841eB81E5C0d8',
-    nftAddress: string = '0x0884efc69d11ce701c3a1526f5a0f904fecf68ab',
-    newDTAddress: string = '0xad0F41c3E6Dba3Df4c05Eb51d72fBb11d62486d4',
-    poolV3Address: string = '0xf10e7320cd3c668d9cf6b3c5bfa86c395b3dc124',
-    oldDdo: string = '0xa4C982DeB2eAA6b4AF3A75aF0B6eE6F5fdd30cD9'
+    address = '0xE75fa34968323219f4664080103746a605d18A47',
+    migrationAddress = '0x4f5664c1b6e689FA6aEfcc34e56841eB81E5C0d8',
+    nftAddress = '0x0884efc69d11ce701c3a1526f5a0f904fecf68ab',
+    newDTAddress = '0xad0F41c3E6Dba3Df4c05Eb51d72fBb11d62486d4',
+    poolV3Address = '0xf10e7320cd3c668d9cf6b3c5bfa86c395b3dc124',
+    oldDdo = '0xa4C982DeB2eAA6b4AF3A75aF0B6eE6F5fdd30cD9'
   ) /* : Promise<TransactionReceipt> */ {
     // contractInstance?: Contract //  didV4: string, //  metaDataHash: string, // bytes: string[], //  metaDataDecryptorUrlAndAddress: string[], // metaDataState: string // minAmountsOut: string[], // poolAddressV3: string, // migrationAddress: string, // address: string,
 
@@ -1276,6 +1273,14 @@ export class Migration {
 
     const args = liquidationTrxReceipt.events.NewPool.returnValues
 
+    // const args = {
+    //   nftAddress: '0xe009f5ec2fc75bb868dd0e1892d4cbf9411bc675',
+    //   newDTAddress: '0xecEf124CF6F71FCF891Daa1Bd5841C00d19F07E0',
+    //   v3DTAddress: '0xb66599951bA6bC5190d1f609FF1e1d54a0D17EA6',
+    //   newPool: '',
+    //   lptRounding: ''
+    // }
+
     console.log('ARGS ', args)
 
     const { nftAddress, newDTAddress, newPool, v3DTAddress, lptRounding } = args
@@ -1307,7 +1312,17 @@ export class Migration {
     const nonce = await providerInstance.getNonce(providerV3Url, address)
 
     const message = `${oldDid}${nonce}`
-    const signedMessage = await this.web3.eth.sign(message, address)
+    const messageHash = await this.web3.utils.utf8ToHex(message)
+
+    // const signedMessage = await this.web3.eth.sign(messageHash, address)
+
+    const signedMessage = await this.web3.eth.personal.sign(
+      messageHash,
+      address,
+      null
+    )
+
+    console.log('SIGNED MESSAGE ', signedMessage)
 
     const urls = await this.getAssetUrl({
       documentId: oldDid,
@@ -1315,6 +1330,8 @@ export class Migration {
       publisherAddress: address,
       signature: signedMessage
     })
+
+    console.log('Urls : ', urls)
 
     const files = urls.map((url) => [
       {
@@ -1350,9 +1367,7 @@ export class Migration {
 
     console.log('Is asset valid?', isValid)
 
-    let tx
-
-    tx = await this.setMetadataAndTransferNFT(
+    let tx = await this.setMetadataAndTransferNFT(
       address,
       migrationAddress,
       poolAddressV3,
@@ -1365,17 +1380,17 @@ export class Migration {
       []
     )
 
-    // tx = await this.setMetadata(
-    //   nftAddress,
-    //   address,
-    //   0,
-    //   providerUrl,
-    //   providerV4Address,
-    //   '0x2',
-    //   encryptedDdo,
-    //   '0x' + metadataHash,
-    //   []
-    // )
+    tx = await this.setMetadata(
+      nftAddress,
+      address,
+      0,
+      providerUrl,
+      providerV4Address,
+      '0x2',
+      encryptedDdo,
+      '0x' + metadataHash,
+      []
+    )
 
     return tx
   }

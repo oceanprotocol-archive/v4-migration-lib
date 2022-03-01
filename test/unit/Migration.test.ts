@@ -55,6 +55,7 @@ describe('Migration test', () => {
       Dispenser.bytecode,
       OPFCommunityFeeCollector.bytecode
     )
+
     await contracts.getAccounts()
     v3DtOwner = contracts.accounts[0]
     user1 = contracts.accounts[1]
@@ -231,10 +232,6 @@ describe('Migration test', () => {
       const poolAddress = '0xAAB9EaBa1AA2653c1Dda9846334700b9F5e14E44' // v4 pool doesn't exist yet so we use a dummy value
 
       const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
-      const flagsAndData = [
-        web3.utils.asciiToHex('0x01'),
-        web3.utils.asciiToHex('SomeData')
-      ]
       const metaDataState = '1'
       const metadataHash = web3.utils.keccak256('METADATA')
       const didV4 = 'did:op:0x2121'
@@ -246,9 +243,11 @@ describe('Migration test', () => {
           poolAddress,
           metaDataState,
           metaDataDecryptorUrlAndAddress,
-          flagsAndData,
+          web3.utils.asciiToHex('0x01'),
+          web3.utils.asciiToHex('SomeData'),
           metadataHash,
-          didV4
+          didV4,
+          []
         )
       } catch (e) {
         assert(e.message == 'Migration not completed yet')
@@ -256,10 +255,6 @@ describe('Migration test', () => {
     })
     it('#setMetadataAndTransferNFT - user should fail to call if NOT daemon', async () => {
       const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
-      const flagsAndData = [
-        web3.utils.asciiToHex('0x01'),
-        web3.utils.asciiToHex('SomeData')
-      ]
       const metaDataState = '1'
       const metadataHash = web3.utils.keccak256('METADATA')
       const didV4 = 'did:op:0x2121'
@@ -271,9 +266,11 @@ describe('Migration test', () => {
           v3pool1Address,
           metaDataState,
           metaDataDecryptorUrlAndAddress,
-          flagsAndData,
+          web3.utils.asciiToHex('0x01'),
+          web3.utils.asciiToHex('SomeData'),
           metadataHash,
-          didV4
+          didV4,
+          []
         )
       } catch (e) {
         console.log(e.message)
@@ -748,10 +745,6 @@ describe('Migration test', () => {
 
     it('#setMetadataAndTransferNFT - daemon should fail to call if status != migrated', async () => {
       const metaDataDecryptorUrlAndAddress = ['http://myprovider:8030', '0x123']
-      const flagsAndData = [
-        web3.utils.asciiToHex('0x01'),
-        web3.utils.asciiToHex('SomeData')
-      ]
       const metaDataState = '1'
       const metadataHash = web3.utils.keccak256('METADATA')
       const didV4 = 'did:op:0x2121'
@@ -763,7 +756,8 @@ describe('Migration test', () => {
           v3pool1Address,
           metaDataState,
           metaDataDecryptorUrlAndAddress,
-          flagsAndData,
+          web3.utils.asciiToHex('0x01'),
+          web3.utils.asciiToHex('SomeData'),
           metadataHash,
           didV4
         )
@@ -1265,7 +1259,8 @@ describe('Migration test', () => {
         v3pool1Address,
         metaDataState,
         metaDataDecryptorUrlAndAddress,
-        flagsAndData,
+        web3.utils.asciiToHex('0x01'),
+        web3.utils.asciiToHex('SomeData'),
         metadataHash,
         didV4
       )

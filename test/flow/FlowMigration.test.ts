@@ -264,7 +264,8 @@ describe('Migration test', () => {
       const ddo1 = await getAndConvertDDO(
         did1,
         args.nftAddress,
-        args.newDTAddress
+        args.newDTAddress,
+        'http://localhost:8000/'
       )
       console.log(ddo1)
       // assert(

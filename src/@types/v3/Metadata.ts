@@ -12,6 +12,6 @@ export interface Metadata {
 }
 
 export interface ValidateMetadata {
-  valid: Boolean
-  errors?: Object
+  valid: boolean
+  errors?: Record<string, unknown>
 }
