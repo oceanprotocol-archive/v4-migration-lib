@@ -761,6 +761,7 @@ export class Migration {
     data: string,
     metaDataHash: string,
     didV4: string,
+    metadataProof?: MetadataProof[],
     contractInstance?: Contract
   ): Promise<any> {
     const migrationContract =
@@ -778,7 +779,8 @@ export class Migration {
           flags,
           data,
           metaDataHash,
-          didV4
+          didV4,
+          metadataProof || []
         )
         .estimateGas({ from: address }, (err, estGas) =>
           err ? gasLimitDefault : estGas
@@ -813,6 +815,7 @@ export class Migration {
     data: string,
     metaDataHash: string,
     didV4: string,
+    metadataProof?: MetadataProof[],
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
     if (
@@ -834,6 +837,7 @@ export class Migration {
       data,
       metaDataHash,
       didV4,
+      metadataProof || [],
       migrationContract
     )
 
@@ -845,7 +849,8 @@ export class Migration {
         flags,
         data,
         metaDataHash,
-        didV4
+        didV4,
+        metadataProof || []
       )
       .send({
         from: address,
@@ -1013,6 +1018,7 @@ export class Migration {
       data,
       metaDataHash,
       'DDOV4.id',
+      [],
       contractInstance
     )
 
@@ -1115,7 +1121,7 @@ export class Migration {
   }
 
   public async getAssetUrl(args: any) {
-    const response: AxiosResponse<DDO> = await axios.get(
+    const response: AxiosResponse<string[]> = await axios.get(
       `https://provider.rinkeby.oceanprotocol.com/api/v1/services/assetUrls`,
       { params: args, headers: { 'Content-Type': 'application/json' } }
     )
@@ -1177,41 +1183,34 @@ export class Migration {
     )
 
     const did = `did:op:${oldDdo.replace('0x', '')}`
-
     const message = `${did}${nonce}`
-    // const message = oldDdo
-
     const signedMessage = await this.web3.eth.sign(message, address)
 
-    // const encryptedFiles = await providerInstance.encrypt(files, providerUrl)
-
-    const url = await this.getAssetUrl({
+    const urls = await this.getAssetUrl({
       documentId: did,
       serviceId: '1',
       publisherAddress: address,
       signature: signedMessage
     })
 
-    console.log('NEW DDO', v4DDO)
+    const files = urls.map((url) => [
+      {
+        type: 'url',
+        url: url,
+        method: 'GET'
+      }
+    ])
 
-    const oldEncryptedFiles = ''
-
-    const valid = await providerInstance.isValidProvider(providerUrl)
+    const encryptedFiles = await this.encryptV4(files, providerUrl)
 
     const nft = new this.web3.eth.Contract(
       ERC721Template.abi as AbiItem[],
       nftAddress
     )
 
-    const nftOwner = await nft.methods.ownerOf(1).call()
-
-    // const encryptedFiles = await providerInstance.encrypt('files', providerUrl)
-
-    // console.log(encryptedFiles)
-
     const poolDdo = { ...v4DDO }
-    // poolDdo.metadata.name = 'test-dataset-pool'
-    poolDdo.services[0].files = oldEncryptedFiles
+
+    poolDdo.services[0].files = encryptedFiles
 
     poolDdo.chainId = chainId
 
@@ -1277,6 +1276,8 @@ export class Migration {
 
     const args = liquidationTrxReceipt.events.NewPool.returnValues
 
+    console.log('ARGS ', args)
+
     const { nftAddress, newDTAddress, newPool, v3DTAddress, lptRounding } = args
 
     const chainId = await this.web3.eth.getChainId()
@@ -1286,6 +1287,8 @@ export class Migration {
     const oldDid = `did:op:${v3DTAddress.replace('0x', '')}`
 
     const providerUrl = 'https://v4.provider.rinkeby.oceanprotocol.com/' // 'http://127.0.0.1:8030'
+
+    const providerV3Url = 'https://provider.rinkeby.oceanprotocol.com/'
 
     const providerV4Address = await this.getProviderV4Address(providerUrl)
 
@@ -1301,28 +1304,35 @@ export class Migration {
 
     const providerInstance = new Provider()
 
-    console.log('NEW DDO', v4DDO)
+    const nonce = await providerInstance.getNonce(providerV3Url, address)
 
-    const oldEncryptedFiles = ''
+    const message = `${oldDid}${nonce}`
+    const signedMessage = await this.web3.eth.sign(message, address)
+
+    const urls = await this.getAssetUrl({
+      documentId: oldDid,
+      serviceId: '1',
+      publisherAddress: address,
+      signature: signedMessage
+    })
+
+    const files = urls.map((url) => [
+      {
+        type: 'url',
+        url: url,
+        method: 'GET'
+      }
+    ])
+
+    const encryptedFiles = await this.encryptV4(files, providerUrl)
 
     const valid = await providerInstance.isValidProvider(providerUrl)
 
     console.log('Is provider valid?', valid)
 
-    const nft = new this.web3.eth.Contract(
-      ERC721Template.abi as AbiItem[],
-      nftAddress
-    )
-
-    const nftOwner = await nft.methods.ownerOf(1).call()
-
-    // TODO decrypto old files and encrypt new files
-    // const encryptedFiles = await providerInstance.encrypt('files', providerUrl)
-    // console.log(encryptedFiles)
-
     const poolDdo = { ...v4DDO }
 
-    poolDdo.services[0].files = oldEncryptedFiles
+    poolDdo.services[0].files = encryptedFiles
 
     poolDdo.chainId = chainId
 
@@ -1351,20 +1361,21 @@ export class Migration {
       '0x2',
       encryptedDdo,
       '0x' + metadataHash,
-      poolDdo.id
-    )
-
-    tx = await this.setMetadata(
-      nftAddress,
-      address,
-      0,
-      providerUrl,
-      providerV4Address,
-      '0x2',
-      encryptedDdo,
-      '0x' + metadataHash,
+      poolDdo.id,
       []
     )
+
+    // tx = await this.setMetadata(
+    //   nftAddress,
+    //   address,
+    //   0,
+    //   providerUrl,
+    //   providerV4Address,
+    //   '0x2',
+    //   encryptedDdo,
+    //   '0x' + metadataHash,
+    //   []
+    // )
 
     return tx
   }
