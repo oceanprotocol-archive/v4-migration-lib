@@ -20,7 +20,7 @@ const run = async () => {
   await migration.runMigration(
     '0xE75fa34968323219f4664080103746a605d18A47',
     '0x3b2A8De44C8C5E2e472c67B3f8da75f26294E875',
-    '0x97f5f3065c2e82fefa3da199500930e9c6039f34',
+    '0xb3c4df47bd319df53827335134fe66856133d7af',
     ['1', '1']
   )
 }

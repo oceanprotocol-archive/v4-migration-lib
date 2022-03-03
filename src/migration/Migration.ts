@@ -1028,18 +1028,31 @@ export class Migration {
     return `did:op:${checksum.toString()}`
   }
 
-  public async validateAssetAquariusV4(asset: any): Promise<any> {
+  public async validateAssetAquariusV4(
+    asset: v4DDO
+  ): Promise<{ validation: MetadataProof; response: any }> {
     const metadataCacheUri =
       process.env.METADATACACHEV4_URI || 'https://v4.aquarius.oceanprotocol.com'
 
-    const response: AxiosResponse<DDO> = await axios.post(
+    const response: AxiosResponse<any> = await axios.post(
       `${metadataCacheUri}/api/aquarius/assets/ddo/validate`,
       asset,
       { headers: { 'Content-Type': 'application/octet-stream' } }
     )
-    if (!response || response.status !== 200 || !response.data) return false
+    if (!response || response.status !== 200 || !response.data)
+      return { response: null, validation: {} }
 
-    return response.data
+    const { publicKey: validatorAddress, r, s, v } = response.data
+
+    return {
+      response: response.data,
+      validation: {
+        validatorAddress,
+        r: r[0],
+        s: s[0],
+        v: v
+      }
+    }
   }
 
   public async getProviderV4Address(providerUrl: any): Promise<any> {
@@ -1274,16 +1287,16 @@ export class Migration {
     const args = liquidationTrxReceipt.events.NewPool.returnValues
 
     // const args = {
-    //   nftAddress: '0xe009f5ec2fc75bb868dd0e1892d4cbf9411bc675',
-    //   newDTAddress: '0xecEf124CF6F71FCF891Daa1Bd5841C00d19F07E0',
-    //   v3DTAddress: '0xb66599951bA6bC5190d1f609FF1e1d54a0D17EA6',
+    //   nftAddress: '0x16602FD45320B105750A8Fd3634096D181a194F4',
+    //   newDTAddress: '0xD5Fcef24e2D1f83f85f4F64Ae179fA5b94f3a28d',
+    //   v3DTAddress: '0x91dB4B1a10Bec43b63Bcb51C755bD0f312A8Dd24',
     //   newPool: '',
     //   lptRounding: ''
     // }
 
     console.log('ARGS ', args)
 
-    const { nftAddress, newDTAddress, newPool, v3DTAddress, lptRounding } = args
+    const { nftAddress, newDTAddress, v3DTAddress } = args
 
     const chainId = await this.web3.eth.getChainId()
 
@@ -1333,13 +1346,11 @@ export class Migration {
 
     console.log('Urls : ', urls)
 
-    const files = urls.map((url) => [
-      {
-        type: 'url',
-        url: url,
-        method: 'GET'
-      }
-    ])
+    const files = urls.map((url) => ({
+      type: 'url',
+      url: url,
+      method: 'GET'
+    }))
 
     const encryptedFiles = await this.encryptV4(files, providerUrl)
 
@@ -1355,7 +1366,7 @@ export class Migration {
 
     poolDdo.id = this.generateDidv4(nftAddress, chainId)
 
-    const validation = await this.validateAssetAquariusV4(poolDdo)
+    const { validation, response } = await this.validateAssetAquariusV4(poolDdo)
 
     const metaDataDecryptorUrlAndAddress = [providerUrl, providerV4Address]
 
@@ -1363,7 +1374,7 @@ export class Migration {
 
     const metadataHash = this.getHash(JSON.stringify(poolDdo))
 
-    const isValid = validation.hash === '0x' + metadataHash // Should be true
+    const isValid = response.hash === '0x' + metadataHash // Should be true
 
     console.log('Is asset valid?', isValid)
 
@@ -1377,7 +1388,7 @@ export class Migration {
       encryptedDdo,
       '0x' + metadataHash,
       poolDdo.id,
-      []
+      [validation]
     )
 
     tx = await this.setMetadata(
@@ -1389,7 +1400,7 @@ export class Migration {
       '0x2',
       encryptedDdo,
       '0x' + metadataHash,
-      []
+      [validation]
     )
 
     return tx
