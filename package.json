@@ -2,10 +2,15 @@
   "name": "v4-migration-lib",
   "version": "0.0.0",
   "description": "V4 Migration Library",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
+  "module": "./dist/index.module.js",
+  "typings": "./dist/index.d.ts",
+  "umd:main": "./dist/index.umd.js",
+  "unpkg": "./dist/index.cjs2.min.js",
   "scripts": {
     "start": "node dist/app.js",
-    "build": "npm run clean && tsc --sourcemap",
+    "build": "npm run clean && tsc --sourcemap && microbundle build --format umd,cjs,es --compress --target node --tsconfig tsconfig.json",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx . && npm run type-check",
     "type-check": "tsc --noEmit",
     "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write",
@@ -33,6 +38,7 @@
   "dependencies": {
     "@oceanprotocol/lib": "^0.20.2",
     "axios": "^0.25.0",
+    "microbundle": "^0.14.2",
     "web3": "^1.3.0",
     "web3-eth-contract": "^1.7.0"
   },
