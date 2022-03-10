@@ -7,6 +7,9 @@ import { AbiItem } from 'web3-utils'
 import ERC721Factory from '../artifacts/ERC721Factory.json'
 import ERC721Template from '../artifacts/ERC721Template.json'
 import { getFairGasPrice } from '../utils'
+import { getAndConvertDDO } from '../DDO/convertDDO'
+import ProviderInstance from '../provider/Provider'
+import sha256 from 'crypto-js/sha256'
 
 export interface MetadataProof {
   validatorAddress?: string
@@ -256,5 +259,76 @@ export class Migration {
         gasPrice: await getFairGasPrice(this.web3)
       })
     return tx
+  }
+
+  public async migrateFixedRateAsset(
+    did: string,
+    ERC721FactoryAddress: string,
+    nftName: string,
+    nftSymbol: string,
+    ownerAddress: string,
+    cap: number,
+    rate: string,
+    flags: string,
+    marketFee: number,
+    publishingMarketFeeAddress: string,
+    publishingMarketTokenAddress: string,
+    fixedRateExchangeAddress: string,
+    baseTokenAddress: string,
+    metaDataState: number,
+    metaDataDecryptorAddress: string,
+    providerUrl: string,
+    metadataCacheUri: string,
+    metadataProofs?: MetadataProof[],
+    contractInstance?: Contract
+  ) {
+    let txReceipt
+    try {
+      txReceipt = await this.publishFixedRateAsset(
+        did,
+        ERC721FactoryAddress,
+        nftName,
+        nftSymbol,
+        ownerAddress,
+        cap,
+        rate,
+        marketFee,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        fixedRateExchangeAddress,
+        baseTokenAddress
+      )
+    } catch (e) {
+      console.log('publishFixedRateAsset Error', e)
+    }
+    const nftAddress = txReceipt.events.NFTCreated.returnValues.newTokenAddress
+    const erc20Address =
+      txReceipt.events.TokenCreated.returnValues.newTokenAddress
+    const ddo = await getAndConvertDDO(
+      did,
+      nftAddress,
+      erc20Address,
+      metadataCacheUri
+    )
+    const provider = await ProviderInstance
+    const encryptedDdo = await provider.encrypt(ddo, providerUrl)
+    const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
+
+    let txReceipt2
+    try {
+      txReceipt2 = await this.updateMetadata(
+        ownerAddress,
+        txReceipt,
+        metaDataState,
+        providerUrl,
+        metaDataDecryptorAddress,
+        flags,
+        encryptedDdo,
+        dataHash
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
+    return { txReceipt, txReceipt2 }
   }
 }
