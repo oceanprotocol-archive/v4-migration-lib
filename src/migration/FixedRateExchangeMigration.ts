@@ -1,6 +1,6 @@
 import Web3 from 'web3'
-import { getAndConvertDDO } from '../DDO/convertDDO'
-import { getDDO } from '../DDO/importDDO'
+// import { getAndConvertDDO } from '../DDO/convertDDO'
+// import { getDDO } from '../DDO/importDDO'
 import { Contract } from 'web3-eth-contract'
 import { TransactionReceipt } from 'web3-eth'
 import { AbiItem } from 'web3-utils'
@@ -31,39 +31,43 @@ export class Migration {
     baseTokenAddress: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
-    const v3DDO = await getDDO(did)
-    const ERC721FactoryContract =
-      contractInstance ||
-      new this.web3.eth.Contract(
-        ERC721Factory.abi as AbiItem[],
-        ERC721FactoryAddress
-      )
-    const tx = ERC721FactoryContract.methods.createNftErcWithFixedRate(
-      {
-        name: nftName,
-        symbol: nftSymbol,
-        templateIndex: 1,
-        tokenURI: 'https://oceanprotocol.com/TEST/'
-      },
-      {
-        strings: ['ERC20WithPool', 'ERC20P'],
-        templateIndex: 1,
-        addresses: [
-          ownerAddress,
-          ownerAddress,
-          publishingMarketFeeAddress,
-          publishingMarketTokenAddress
-        ],
-        uints: [cap, 0],
-        bytess: []
-      },
-      {
-        fixedPriceAddress: fixedRateExchangeAddress,
-        addresses: [baseTokenAddress, ownerAddress, publishingMarketFeeAddress],
-        uints: [18, 18, rate, marketFee, 0]
-      }
+    // const v3DDO = await getDDO(did)
+    const ERC721FactoryContract = new this.web3.eth.Contract(
+      ERC721Factory.abi as AbiItem[],
+      ERC721FactoryAddress
     )
-    const txReceipt = await tx.wait()
-    return txReceipt
+    // console.log('ERC721FactoryContract.methods', ERC721FactoryContract.methods)
+
+    const tx =
+      await ERC721FactoryContract.methods.createNftWithErc20WithFixedRate(
+        {
+          name: nftName,
+          symbol: nftSymbol,
+          templateIndex: 1,
+          tokenURI: 'https://oceanprotocol.com/TEST/'
+        },
+        {
+          strings: ['ERC20WithPool', 'ERC20P'],
+          templateIndex: 1,
+          addresses: [
+            ownerAddress,
+            ownerAddress,
+            publishingMarketFeeAddress,
+            publishingMarketTokenAddress
+          ],
+          uints: [cap, 0],
+          bytess: []
+        },
+        {
+          fixedPriceAddress: fixedRateExchangeAddress,
+          addresses: [
+            baseTokenAddress,
+            ownerAddress,
+            publishingMarketFeeAddress
+          ],
+          uints: [18, 18, rate, marketFee, 0]
+        }
+      )
+    return tx
   }
 }

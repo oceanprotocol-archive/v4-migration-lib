@@ -23,7 +23,8 @@
     "test:integration:cover": "nyc --report-dir coverage/integration --no-clean npm run test:integration",
     "test:migration": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/Migration.test.ts'",
     "test:ddo": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/ddo.test.ts'",
-    "test:flow": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/flow/FlowMigration.test.ts'"
+    "test:flow": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/flow/FlowMigration.test.ts'",
+    "test:fixed": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/FixedMigration.test.ts'"
   },
   "repository": {
     "type": "git",
