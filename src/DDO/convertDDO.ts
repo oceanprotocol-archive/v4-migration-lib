@@ -47,10 +47,13 @@ export async function convertDDO(
   return v4DDO
 }
 
-export async function getAndConvertDDO(did: string): Promise<v4DDO> {
-  const nftAddress = ''
-  const erc20Address = ''
-  const v3DDO: v3DDO = await getDDO(did)
+export async function getAndConvertDDO(
+  did: string,
+  nftAddress: string,
+  erc20Address: string,
+  metadataCacheUri: string
+): Promise<v4DDO> {
+  const v3DDO: v3DDO = await getDDO(did, metadataCacheUri)
 
   const v4DDO: v4DDO = await convertDDO(did, v3DDO, nftAddress, erc20Address)
 
