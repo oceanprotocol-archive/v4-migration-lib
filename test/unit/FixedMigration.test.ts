@@ -38,7 +38,7 @@ describe('Migration test', () => {
     nftSymbol: string,
     ownerAddress: string,
     cap: number,
-    rate: number,
+    rate: string,
     marketFee: number,
     publishingMarketFeeAddress: string,
     publishingMarketTokenAddress: string,
@@ -101,15 +101,15 @@ describe('Migration test', () => {
     nftName = 'OCEAN NFT'
     nftSymbol = 'OCEAN-NFT'
     cap = 10000
-    rate = 10
-    marketFee = 0.1
+    marketFee = 1e15
+    rate = web3.utils.toWei('1')
     publishingMarketFeeAddress = '0x9984b2453eC7D99a73A5B3a46Da81f197B753C8d'
     publishingMarketTokenAddress = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
     fixedRateExchangeAddress = fixedRateAddress
     baseTokenAddress = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
-
+    let txReceipt
     try {
-      const txReciept = await migration.migratedFixedRateAsset(
+      txReceipt = await migration.migratedFixedRateAsset(
         did,
         ERC721FactoryAddress,
         nftName,
@@ -123,9 +123,12 @@ describe('Migration test', () => {
         fixedRateExchangeAddress,
         baseTokenAddress
       )
-      console.log('txReciept', txReciept)
     } catch (e) {
       console.log('Error', e)
     }
+
+    expect(txReceipt.events.NFTCreated != null)
+    expect(txReceipt.events.TokenCreated != null)
+    expect(txReceipt.events.NewFixedRate != null)
   })
 })
