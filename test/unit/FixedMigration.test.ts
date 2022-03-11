@@ -35,6 +35,9 @@ const publishingMarketTokenAddress =
   '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
 const baseTokenAddress = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
 const flags = '0x123'
+const templateIndex = 1
+const dtName = 'Test Datatoken'
+const dtSymbol = 'TEST-DT'
 
 describe('Migration test', () => {
   let v3DtOwner: string,
@@ -115,7 +118,10 @@ describe('Migration test', () => {
         publishingMarketFeeAddress,
         publishingMarketTokenAddress,
         fixedRateAddress,
-        baseTokenAddress
+        baseTokenAddress,
+        templateIndex,
+        dtName,
+        dtSymbol
       )
     } catch (e) {
       console.log('Error', e)
@@ -179,7 +185,10 @@ describe('Migration test', () => {
         1,
         '0x123',
         providerUrl,
-        metadataCacheUri
+        metadataCacheUri,
+        templateIndex,
+        dtName,
+        dtSymbol
       )
     } catch (e) {
       console.log('Error', e)

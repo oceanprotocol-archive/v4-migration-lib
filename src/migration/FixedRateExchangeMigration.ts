@@ -1,6 +1,4 @@
 import Web3 from 'web3'
-// import { getAndConvertDDO } from '../DDO/convertDDO'
-// import { getDDO } from '../DDO/importDDO'
 import { Contract } from 'web3-eth-contract'
 import { TransactionReceipt } from 'web3-eth'
 import { AbiItem } from 'web3-utils'
@@ -41,6 +39,9 @@ export class Migration {
     publishingMarketTokenAddress: string,
     fixedRateExchangeAddress: string,
     baseTokenAddress: string,
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
     contractInstance?: Contract
   ): Promise<any> {
     // const v3DDO = await getDDO(did)
@@ -57,12 +58,12 @@ export class Migration {
           {
             name: nftName,
             symbol: nftSymbol,
-            templateIndex: 1,
+            templateIndex,
             tokenURI: 'https://oceanprotocol.com/TEST/'
           },
           {
-            strings: ['ERC20WithPool', 'ERC20P'],
-            templateIndex: 1,
+            strings: [dtName, dtSymbol],
+            templateIndex,
             addresses: [
               ownerAddress,
               ownerAddress,
@@ -105,6 +106,9 @@ export class Migration {
     publishingMarketTokenAddress: string,
     fixedRateExchangeAddress: string,
     baseTokenAddress: string,
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
     // const v3DDO = await getDDO(did)
@@ -125,7 +129,10 @@ export class Migration {
       publishingMarketFeeAddress,
       publishingMarketTokenAddress,
       fixedRateExchangeAddress,
-      baseTokenAddress
+      baseTokenAddress,
+      templateIndex,
+      dtName,
+      dtSymbol
     )
     let tx
     try {
@@ -134,12 +141,12 @@ export class Migration {
           {
             name: nftName,
             symbol: nftSymbol,
-            templateIndex: 1,
+            templateIndex,
             tokenURI: 'https://oceanprotocol.com/TEST/'
           },
           {
-            strings: ['ERC20WithPool', 'ERC20P'],
-            templateIndex: 1,
+            strings: [dtName, dtSymbol],
+            templateIndex,
             addresses: [
               ownerAddress,
               ownerAddress,
@@ -279,6 +286,9 @@ export class Migration {
     metaDataDecryptorAddress: string,
     providerUrl: string,
     metadataCacheUri: string,
+    templateIndex,
+    dtName,
+    dtSymbol,
     metadataProofs?: MetadataProof[],
     contractInstance?: Contract
   ) {
@@ -296,7 +306,10 @@ export class Migration {
         publishingMarketFeeAddress,
         publishingMarketTokenAddress,
         fixedRateExchangeAddress,
-        baseTokenAddress
+        baseTokenAddress,
+        templateIndex,
+        dtName,
+        dtSymbol
       )
     } catch (e) {
       console.log('publishFixedRateAsset Error', e)
