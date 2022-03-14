@@ -32,10 +32,8 @@ export class Migration {
     web3: Web3,
     accountId,
     did: string,
-    nonce: number,
     providerUri: string,
-    serviceId,
-    publisherAddress
+    serviceId
   ) {
     const provider = await ProviderInstance
     const signature = provider.createSignature(web3, accountId, did + nonce)
@@ -49,12 +47,13 @@ export class Migration {
       : null
 
     if (!path) return null
+    const nonce = provider.getNonce(providerUri, accountId)
     const data = {
       documentId: did,
       signature: signature,
       serviceId: serviceId,
       nonce: nonce,
-      publisherAddress: publisherAddress
+      publisherAddress: accountId
     }
 
     try {
