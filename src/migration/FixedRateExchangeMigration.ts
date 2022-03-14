@@ -26,6 +26,52 @@ export class Migration {
     this.startBlock = startBlock || 0
   }
 
+  // public async estGasGetAssetURL() {}
+
+  public async getAssetURL(
+    web3: Web3,
+    accountId,
+    did: string,
+    nonce: number,
+    providerUri: string,
+    serviceId,
+    publisherAddress
+  ) {
+    const provider = await ProviderInstance
+    const signature = provider.createSignature(web3, accountId, did + nonce)
+    const providerEndpoints = await provider.getEndpoints(providerUri)
+    const serviceEndpoints = await provider.getServiceEndpoints(
+      providerUri,
+      providerEndpoints
+    )
+    const path = provider.getEndpointURL(serviceEndpoints, 'encrypt')
+      ? provider.getEndpointURL(serviceEndpoints, 'encrypt').urlPath
+      : null
+
+    if (!path) return null
+    const data = {
+      documentId: did,
+      signature: signature,
+      serviceId: serviceId,
+      nonce: nonce,
+      publisherAddress: publisherAddress
+    }
+
+    try {
+      const response = await fetch(path, {
+        method: 'GET',
+        body: decodeURI(JSON.stringify(data)),
+        headers: {
+          'Content-Type': 'application/octet-stream'
+        }
+      })
+      return await response.text()
+    } catch (e) {
+      console.error(e)
+      throw new Error('HTTP request failed')
+    }
+  }
+
   public async estGasPublishFixedRateAsset(
     did: string,
     ERC721FactoryAddress: string,
