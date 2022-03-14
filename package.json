@@ -24,7 +24,8 @@
     "test:migration": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/Migration.test.ts'",
     "test:ddo": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/ddo.test.ts'",
     "test:flow": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/flow/FlowMigration.test.ts'",
-    "test:fixed": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/FixedMigration.test.ts'"
+    "test:fixed": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/unit/FixedMigration.test.ts'",
+    "test:v3": "mocha --config=test/unit/.mocharc.json --node-env=test --exit 'test/v3/getV3AssetURL.test.ts'"
   },
   "repository": {
     "type": "git",
@@ -48,6 +49,7 @@
     "@babel/core": "^7.17.0",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/preset-typescript": "^7.13.0",
+    "@oceanprotocol/contracts": "^0.6.9",
     "@types/chai": "^4.2.19",
     "@types/express": "^4.17.11",
     "@types/mocha": "^9.0.0",

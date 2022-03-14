@@ -113,6 +113,7 @@ describe('Migration test', () => {
       providerUrl,
       1
     )
+    console.log('Asset URL', url)
     assert(url != undefined, 'Failed to initialize Migration class')
   })
 

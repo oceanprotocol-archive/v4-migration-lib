@@ -8,6 +8,7 @@ import { getFairGasPrice } from '../utils'
 import { getAndConvertDDO } from '../DDO/convertDDO'
 import ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
+import fetch from 'cross-fetch'
 
 export interface MetadataProof {
   validatorAddress?: string
@@ -36,7 +37,12 @@ export class Migration {
     serviceId
   ) {
     const provider = await ProviderInstance
-    const signature = provider.createSignature(web3, accountId, did + nonce)
+    const nonce = await provider.getNonce(providerUri, accountId)
+    const signature = await provider.createSignature(
+      web3,
+      accountId,
+      did + nonce
+    )
     const providerEndpoints = await provider.getEndpoints(providerUri)
     const serviceEndpoints = await provider.getServiceEndpoints(
       providerUri,
@@ -47,21 +53,19 @@ export class Migration {
       : null
 
     if (!path) return null
-    const nonce = provider.getNonce(providerUri, accountId)
-    const data = {
-      documentId: did,
-      signature: signature,
-      serviceId: serviceId,
-      nonce: nonce,
-      publisherAddress: accountId
-    }
 
+    let initializeUrl = path
+    initializeUrl += `?documentId=${did}`
+    initializeUrl += `&signature=${signature}`
+    initializeUrl += `&serviceId=${serviceId}`
+    initializeUrl += `&nonce=${nonce}`
+    initializeUrl += `&publisherAddress=${accountId}`
+    console.log('initializeUrl', initializeUrl)
     try {
-      const response = await fetch(path, {
+      const response = await fetch(initializeUrl, {
         method: 'GET',
-        body: decodeURI(JSON.stringify(data)),
         headers: {
-          'Content-Type': 'application/octet-stream'
+          'Content-Type': 'application/json'
         }
       })
       return await response.text()
