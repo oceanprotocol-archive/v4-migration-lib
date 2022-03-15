@@ -104,18 +104,18 @@ describe('Migration test', () => {
     fixedRateAddress = contracts.fixedRateAddress
   })
 
-  it('should get the asset URL', async () => {
-    migration = new Migration(web3)
-    const url = await migration.getAssetURL(
-      web3,
-      v3DtOwner,
-      'did:op:D75e24d5eFC94191107e558422d1455deac0A551',
-      providerUrl,
-      1
-    )
-    console.log('Asset URL', url)
-    assert(url != undefined, 'Failed to initialize Migration class')
-  })
+  // it('should get the asset URL', async () => {
+  //   migration = new Migration(web3)
+  //   const url = await migration.getAssetURL(
+  //     web3,
+  //     v3DtOwner,
+  //     'did:op:D75e24d5eFC94191107e558422d1455deac0A551',
+  //     providerUrl,
+  //     1
+  //   )
+  //   console.log('Asset URL', url)
+  //   assert(url != undefined, 'Failed to initialize Migration class')
+  // })
 
   it('should publish Fixed Rate Asset', async () => {
     try {

@@ -9,6 +9,7 @@ import { Ocean } from '../../src/v3/ocean/Ocean'
 import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
 import { TestContractHandler } from './TestContractHandler'
 import { LoggerInstance } from '../../src/v3/utils'
+import { Migration } from '../../src/migration/FixedRateExchangeMigration'
 
 const web3 = new Web3('http://127.0.0.1:8545')
 const url = 'https://s3.amazonaws.com/testfiles.oceanprotocol.com/info.0.json'
@@ -118,10 +119,26 @@ describe('Get V3 URL flow', () => {
     await ocean.metadataCache.waitForAqua(ddo.id)
   })
 
-  it('Alice tries to get the asset URL from the provider', async () => {
+  it('Alice tries to get the asset URL from the V3 provider', async () => {
     try {
       const did = ddo.id
       const urlResponse = await ocean.provider.getAssetURL(alice, did, 1)
+      assert(urlResponse !== undefined, 'Failed to get asset url')
+      assert(urlResponse === url, 'Wrong or invalid url returned')
+    } catch (error) {
+      assert(error === null, 'Order should not throw error')
+    }
+  })
+  it('Alice tries to get the asset URL using the migration', async () => {
+    try {
+      const migration = new Migration(web3)
+      const did = ddo.id
+      const urlResponse = await migration.getAssetURL(
+        web3,
+        alice,
+        did,
+        'development'
+      )
       assert(urlResponse !== undefined, 'Failed to get asset url')
       assert(urlResponse === url, 'Wrong or invalid url returned')
     } catch (error) {

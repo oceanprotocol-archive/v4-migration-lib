@@ -647,7 +647,6 @@ export class Provider extends Instantiable {
         }
       })
       const responseURL = JSON.parse(await response.text())[0]
-
       return responseURL
     } catch (e) {
       console.error(e)

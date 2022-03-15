@@ -9,6 +9,8 @@ import { getAndConvertDDO } from '../DDO/convertDDO'
 import ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
 import fetch from 'cross-fetch'
+import { Ocean as V3Ocean } from '../../src/v3/ocean/Ocean'
+import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
 
 export interface MetadataProof {
   validatorAddress?: string
@@ -27,52 +29,23 @@ export class Migration {
     this.startBlock = startBlock || 0
   }
 
-  // public async estGasGetAssetURL() {}
-
   public async getAssetURL(
     web3: Web3,
-    accountId,
+    account,
     did: string,
-    providerUri: string,
-    serviceId
-  ) {
-    const provider = await ProviderInstance
-    const nonce = await provider.getNonce(providerUri, accountId)
-    const signature = await provider.createSignature(
-      web3,
-      accountId,
-      did + nonce
-    )
-    const providerEndpoints = await provider.getEndpoints(providerUri)
-    const serviceEndpoints = await provider.getServiceEndpoints(
-      providerUri,
-      providerEndpoints
-    )
-    const path = provider.getEndpointURL(serviceEndpoints, 'encrypt')
-      ? provider.getEndpointURL(serviceEndpoints, 'encrypt').urlPath
-      : null
-
-    if (!path) return null
-
-    let initializeUrl = path
-    initializeUrl += `?documentId=${did}`
-    initializeUrl += `&signature=${signature}`
-    initializeUrl += `&serviceId=${serviceId}`
-    initializeUrl += `&nonce=${nonce}`
-    initializeUrl += `&publisherAddress=${accountId}`
-    console.log('initializeUrl', initializeUrl)
+    network: string | number,
+    infuraProjectId?: string
+  ): Promise<string> {
+    let urlResponse: string
     try {
-      const response = await fetch(initializeUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      return await response.text()
-    } catch (e) {
-      console.error(e)
-      throw new Error('HTTP request failed')
+      const config = new ConfigHelper().getConfig(network, infuraProjectId)
+      config.web3Provider = web3
+      const ocean = await V3Ocean.getInstance(config)
+      urlResponse = await ocean.provider.getAssetURL(account, did, 1)
+    } catch (error) {
+      console.log('error', error)
     }
+    return urlResponse
   }
 
   public async estGasPublishFixedRateAsset(
