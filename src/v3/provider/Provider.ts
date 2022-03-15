@@ -622,11 +622,9 @@ export class Provider extends Instantiable {
     // const provider = await ProviderInstance
     const accountId = account.getId()
     const nonce = await this.getNonce(accountId)
-    console.log('nonce', nonce)
     let signature
     try {
       signature = await this.createSignature(account, did + nonce)
-      console.log('signature', signature)
     } catch (error) {
       console.log('error', error)
     }
@@ -634,7 +632,6 @@ export class Provider extends Instantiable {
       ? this.getEndpointURL('encrypt').urlPath
       : null
 
-    console.log('path', path)
     if (path === null) path = 'http://localhost:8030/api/v1/services/assetUrls'
     let initializeUrl = path
     initializeUrl += `?documentId=${did}`
@@ -643,15 +640,15 @@ export class Provider extends Instantiable {
     initializeUrl += `&nonce=${nonce}`
     initializeUrl += `&publisherAddress=${accountId}`
     try {
-      console.log('initializeUrl', initializeUrl)
       const response = await fetch(initializeUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       })
-      console.log('response', response)
-      return await response.text()
+      const responseURL = JSON.parse(await response.text())[0]
+
+      return responseURL
     } catch (e) {
       console.error(e)
       throw new Error('HTTP request failed')

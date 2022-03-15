@@ -11,6 +11,7 @@ import { TestContractHandler } from './TestContractHandler'
 import { LoggerInstance } from '../../src/v3/utils'
 
 const web3 = new Web3('http://127.0.0.1:8545')
+const url = 'https://s3.amazonaws.com/testfiles.oceanprotocol.com/info.0.json'
 
 describe('Get V3 URL flow', () => {
   let owner: Account
@@ -74,7 +75,7 @@ describe('Get V3 URL flow', () => {
         files: [
           {
             index: 0,
-            url: 'https://s3.amazonaws.com/testfiles.oceanprotocol.com/info.0.json',
+            url,
             checksum: 'efb2c764274b745f5fc37f97c6b0e761',
             contentLength: '4535431',
             contentType: 'text/csv',
@@ -105,7 +106,6 @@ describe('Get V3 URL flow', () => {
     } catch (error) {
       console.log('error', error)
     }
-    console.log('ddo', ddo)
     assert(ddo.dataToken === tokenAddress)
     let storeTx
     try {
@@ -113,8 +113,6 @@ describe('Get V3 URL flow', () => {
     } catch (error) {
       console.log('error', error)
     }
-    console.log('storeTx', storeTx)
-
     assert(storeTx)
     // wait for all this assets to be published
     await ocean.metadataCache.waitForAqua(ddo.id)
@@ -123,10 +121,9 @@ describe('Get V3 URL flow', () => {
   it('Alice tries to get the asset URL from the provider', async () => {
     try {
       const did = ddo.id
-      console.log('did', did)
-      const url = await ocean.provider.getAssetURL(alice, did, 1)
-      console.log('Asset URL', url)
-      assert(url !== undefined, 'Failed to get asset url')
+      const urlResponse = await ocean.provider.getAssetURL(alice, did, 1)
+      assert(urlResponse !== undefined, 'Failed to get asset url')
+      assert(urlResponse === url, 'Wrong or invalid url returned')
     } catch (error) {
       assert(error === null, 'Order should not throw error')
     }
