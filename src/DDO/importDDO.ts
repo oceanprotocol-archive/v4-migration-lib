@@ -1,4 +1,4 @@
-import { DDO, DID, Logger } from '@oceanprotocol/lib'
+import { DDO, DID, Logger } from '../v3'
 import axios, { AxiosResponse } from 'axios'
 
 export async function getDDO(
