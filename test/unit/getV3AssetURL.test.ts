@@ -7,7 +7,7 @@ import { DataTokens } from '../../src/v3/datatokens/Datatokens'
 import { Account, ServiceAccess } from '../../src/v3/lib'
 import { Ocean } from '../../src/v3/ocean/Ocean'
 import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
-import { TestContractHandler } from './TestContractHandler'
+import { TestContractHandler } from '../V3TestContractHandler'
 import { LoggerInstance } from '../../src/v3/utils'
 import { Migration } from '../../src/migration/FixedRateExchangeMigration'
 

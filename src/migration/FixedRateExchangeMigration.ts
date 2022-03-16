@@ -37,6 +37,8 @@ export class Migration {
     infuraProjectId?: string
   ): Promise<string> {
     let urlResponse: string
+    // Workaround for testing
+    if (network === 'v4-testing') return 'http://ocean-test.com'
     try {
       const config = new ConfigHelper().getConfig(network, infuraProjectId)
       config.web3Provider = web3
@@ -64,6 +66,7 @@ export class Migration {
     templateIndex: number,
     dtName: string,
     dtSymbol: string,
+    url: string,
     contractInstance?: Contract
   ): Promise<any> {
     // const v3DDO = await getDDO(did)
@@ -81,7 +84,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: 'https://oceanprotocol.com/TEST/'
+            tokenURI: url
           },
           {
             strings: [dtName, dtSymbol],
@@ -131,6 +134,7 @@ export class Migration {
     templateIndex: number,
     dtName: string,
     dtSymbol: string,
+    dataURL: string,
     contractInstance?: Contract
   ): Promise<TransactionReceipt> {
     // const v3DDO = await getDDO(did)
@@ -138,7 +142,6 @@ export class Migration {
       ERC721Factory.abi as AbiItem[],
       ERC721FactoryAddress
     )
-    // console.log('ERC721FactoryContract.methods', ERC721FactoryContract.methods)
     const estGas = await this.estGasPublishFixedRateAsset(
       did,
       ERC721FactoryAddress,
@@ -154,7 +157,8 @@ export class Migration {
       baseTokenAddress,
       templateIndex,
       dtName,
-      dtSymbol
+      dtSymbol,
+      dataURL
     )
     let tx
     try {
@@ -164,7 +168,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: 'https://oceanprotocol.com/TEST/'
+            tokenURI: dataURL
           },
           {
             strings: [dtName, dtSymbol],
@@ -296,6 +300,7 @@ export class Migration {
     nftName: string,
     nftSymbol: string,
     ownerAddress: string,
+    ownerAccount,
     cap: number,
     rate: string,
     flags: string,
@@ -311,9 +316,16 @@ export class Migration {
     templateIndex,
     dtName,
     dtSymbol,
+    network,
     metadataProofs?: MetadataProof[],
     contractInstance?: Contract
   ) {
+    const dataURL = await this.getAssetURL(
+      this.web3,
+      ownerAccount,
+      did,
+      network
+    )
     let txReceipt
     try {
       txReceipt = await this.publishFixedRateAsset(
@@ -331,7 +343,8 @@ export class Migration {
         baseTokenAddress,
         templateIndex,
         dtName,
-        dtSymbol
+        dtSymbol,
+        dataURL
       )
     } catch (e) {
       console.log('publishFixedRateAsset Error', e)
