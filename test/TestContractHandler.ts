@@ -1,12 +1,12 @@
 import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils/types'
-import MockERC20 from '../../src/v3/artifacts/MockERC20.json'
-import V4Migration from '../../src/v3/artifacts/V4Migration.json'
-import V3BFactory from '../../src/v3/artifacts/V3BFactory.json'
-import V3DTFactory from '../../src/v3/artifacts/DTFactory.json'
-import V3BPoolTemplate from '../../src/v3/artifacts/V3BPool.json'
-import V3DatatokenTemplate from '../../src/v3/artifacts/DataTokenTemplate.json'
+import MockERC20 from './../src/artifacts/MockERC20.json'
+import V4Migration from './../src/artifacts/V4Migration.json'
+import V3BFactory from './../src/artifacts/V3BFactory.json'
+import V3DTFactory from './../src/artifacts/DTFactory.json'
+import V3BPoolTemplate from './../src/artifacts/V3BPool.json'
+import V3DatatokenTemplate from './../src/artifacts/DataTokenTemplate.json'
 
 export class TestContractHandler {
   public accounts: string[]

@@ -38,7 +38,7 @@ export class Migration {
   ): Promise<string> {
     let urlResponse: string
     // Workaround for testing
-    if (network === 'v4-testing') return 'http://ocean-test.com'
+    if (network === 'v4-testing') return 'http://oceanprotocol.com/test'
     try {
       const config = new ConfigHelper().getConfig(network, infuraProjectId)
       config.web3Provider = web3
