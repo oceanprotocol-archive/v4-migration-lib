@@ -562,7 +562,6 @@ export class TestContractHandler {
       this.v3BFactoryAddress
     )
     let trxReceipt
-    console.log('aqui1')
     // CREATE V3 datatoken1
     try {
       trxReceipt = await V3DtFactory.methods
@@ -571,8 +570,6 @@ export class TestContractHandler {
     } catch (e) {
       console.log(e.message)
     }
-
-    console.log('aqui2')
 
     this.v3dt1Address =
       trxReceipt.events.TokenCreated.returnValues.newTokenAddress
@@ -665,9 +662,6 @@ export class TestContractHandler {
       )
       .send({ from: owner })
 
-    console.log(await V3Pool1.methods.isFinalized().call())
-    console.log(await V3Pool2.methods.isFinalized().call())
-
     // v3 lpt owner transfer half of his LPTs to user1 and user2 (30 y 20 Lpts respectively)
     await V3Pool1.methods
       .transfer(this.accounts[1], this.web3.utils.toWei('30')) // 30 out of 100
@@ -675,9 +669,6 @@ export class TestContractHandler {
     await V3Pool1.methods
       .transfer(this.accounts[2], this.web3.utils.toWei('20')) // 20 out of 100
       .send({ from: owner })
-
-    console.log(await V3Pool1.methods.balanceOf(this.accounts[1]).call())
-    console.log(await V3Pool1.methods.balanceOf(this.accounts[2]).call())
 
     // V4 set up
     await RouterContract.methods

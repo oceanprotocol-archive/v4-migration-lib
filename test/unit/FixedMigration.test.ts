@@ -170,7 +170,7 @@ describe('Migration test', () => {
 
   it('should migrate the fixed priced Asset', async () => {
     let response
-    console.log('Account or address: ', v3DtOwner)
+
     try {
       response = await migration.migrateFixedRateAsset(
         did,
