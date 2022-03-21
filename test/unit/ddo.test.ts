@@ -18,6 +18,7 @@ describe('Imports V3 DDO', () => {
       ddo1.service[0].attributes.main.name ===
         '🖼  DataUnion.app - Image & Annotation Vault  📸'
     )
+    assert(ddo1.service[1].type === 'access')
   })
   it('Imports 2nd DDO', async () => {
     const ddo2: v3DDO = await getDDO(did2, metadataCacheUri)
@@ -25,6 +26,7 @@ describe('Imports V3 DDO', () => {
       ddo2.service[0].attributes.main.name ===
         'Product Pages of 1’044’709 Products on Amazon.com (processed data)'
     )
+    assert(ddo2.service[1].type === 'access')
   })
   it('Imports 3rd DDO', async () => {
     const ddo3: v3DDO = await getDDO(did3, metadataCacheUri)
@@ -32,6 +34,7 @@ describe('Imports V3 DDO', () => {
       ddo3.service[0].attributes.main.name ===
         'Posthuman: DistilBERT QA inference Algo v2'
     )
+    assert(ddo3.service[1].type === 'access')
   })
 })
 

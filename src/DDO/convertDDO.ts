@@ -35,7 +35,7 @@ export async function convertDDO(
     services: [
       {
         id: did,
-        type: v3DDO.service[0].attributes.main.type,
+        type: v3DDO.service[1].type,
         files: '',
         datatokenAddress: erc20Address,
         serviceEndpoint: v3DDO.service[1].serviceEndpoint,
