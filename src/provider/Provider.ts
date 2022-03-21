@@ -146,6 +146,7 @@ export class Provider {
     providerUri: string,
     signal?: AbortSignal
   ): Promise<string> {
+    console.log({ data, providerUri })
     const providerEndpoints = await this.getEndpoints(providerUri)
     const serviceEndpoints = await this.getServiceEndpoints(
       providerUri,
@@ -154,7 +155,6 @@ export class Provider {
     const path = this.getEndpointURL(serviceEndpoints, 'encrypt')
       ? this.getEndpointURL(serviceEndpoints, 'encrypt').urlPath
       : null
-
     if (!path) return null
     try {
       const response = await fetch(path, {

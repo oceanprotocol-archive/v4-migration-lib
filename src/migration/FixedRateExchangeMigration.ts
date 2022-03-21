@@ -11,7 +11,20 @@ import sha256 from 'crypto-js/sha256'
 import fetch from 'cross-fetch'
 import { Ocean as V3Ocean } from '../../src/v3/ocean/Ocean'
 import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
+import { FileMetadata } from '../@types'
 
+export async function getEncryptedFiles(
+  files: FileMetadata[],
+  providerUrl: string
+): Promise<string> {
+  try {
+    // https://github.com/oceanprotocol/provider/blob/v4main/API.md#encrypt-endpoint
+    const response = await ProviderInstance.encrypt(files, providerUrl)
+    return response
+  } catch (error) {
+    console.error('Error parsing json: ' + error.message)
+  }
+}
 export interface MetadataProof {
   validatorAddress?: string
   r?: string
@@ -48,6 +61,25 @@ export class Migration {
       console.log('error', error)
     }
     return urlResponse
+  }
+
+  public async getEncryptedFiles(
+    assetURL: string,
+    providerUrl: string
+  ): Promise<string> {
+    const file = [
+      {
+        type: 'url',
+        url: assetURL,
+        method: 'GET'
+      }
+    ]
+    try {
+      const response = await getEncryptedFiles(file, providerUrl)
+      return response
+    } catch (error) {
+      console.error('Error parsing json: ' + error.message)
+    }
   }
 
   public async estGasPublishFixedRateAsset(
@@ -356,7 +388,9 @@ export class Migration {
       did,
       nftAddress,
       erc20Address,
-      metadataCacheUri
+      metadataCacheUri,
+      providerUrl,
+      this.web3
     )
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)

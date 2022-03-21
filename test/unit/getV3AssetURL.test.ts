@@ -12,7 +12,8 @@ import { LoggerInstance } from '../../src/v3/utils'
 import { Migration } from '../../src/migration/FixedRateExchangeMigration'
 
 const web3 = new Web3('http://127.0.0.1:8545')
-const url = 'https://s3.amazonaws.com/testfiles.oceanprotocol.com/info.0.json'
+const url = 'https://people.sc.fsu.edu/~jburkardt/data/csv/homes.csv'
+const v4ProviderUrl = 'https://v4.provider.ropsten.oceanprotocol.com'
 
 describe('Get V3 URL flow', () => {
   let owner: Account
@@ -28,6 +29,7 @@ describe('Get V3 URL flow', () => {
   let ocean: Ocean
   let data
   let blob
+  let migration
 
   it('Initialize Ocean contracts v3', async () => {
     contracts = new TestContractHandler(
@@ -45,6 +47,7 @@ describe('Get V3 URL flow', () => {
     data = { t: 1, url: config.metadataCacheUri }
     blob = JSON.stringify(data)
     await contracts.deployContracts(owner.getId())
+    migration = new Migration(web3)
   })
 
   it('Alice publishes a datatoken contract', async () => {
@@ -131,7 +134,6 @@ describe('Get V3 URL flow', () => {
   })
   it('Alice tries to get the asset URL using the migration', async () => {
     try {
-      const migration = new Migration(web3)
       const did = ddo.id
       const urlResponse = await migration.getAssetURL(
         web3,
@@ -141,6 +143,19 @@ describe('Get V3 URL flow', () => {
       )
       assert(urlResponse !== undefined, 'Failed to get asset url')
       assert(urlResponse === url, 'Wrong or invalid url returned')
+    } catch (error) {
+      assert(error === null, 'Order should not throw error')
+    }
+  })
+  it('Alice tries to get the encrypted Files using the migration', async () => {
+    try {
+      const providerUrl = ocean.provider.url
+      const encryptedFiles = await migration.getEncryptedFiles(
+        url,
+        v4ProviderUrl
+      )
+      console.log('encryptedFiles', encryptedFiles)
+      assert(encryptedFiles !== undefined, 'Failed to get asset url')
     } catch (error) {
       assert(error === null, 'Order should not throw error')
     }

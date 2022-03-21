@@ -34,7 +34,7 @@ const publishingMarketFeeAddress = '0x9984b2453eC7D99a73A5B3a46Da81f197B753C8d'
 const publishingMarketTokenAddress =
   '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
 const baseTokenAddress = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
-const flags = '0x123'
+const flags = '0x02'
 const templateIndex = 1
 const dtName = 'Test Datatoken'
 const dtSymbol = 'TEST-DT'
