@@ -8,10 +8,10 @@ import { getFairGasPrice } from '../utils'
 import { getAndConvertDDO } from '../DDO/convertDDO'
 import ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
-import fetch from 'cross-fetch'
 import { Ocean as V3Ocean } from '../../src/v3/ocean/Ocean'
 import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
-import { FileMetadata } from '../@types'
+import { Account } from '../v3'
+import { MetadataAndTokenURI, DDO as v4DDO } from '../@types'
 
 export interface MetadataProof {
   validatorAddress?: string
@@ -30,8 +30,17 @@ export class Migration {
     this.startBlock = startBlock || 0
   }
 
+  public async getHash(message: string): Promise<string> {
+    let hex = ''
+    for (let i = 0; i < message.length; i++) {
+      hex += '' + message.charCodeAt(i).toString(16)
+    }
+    const hexMessage = '0x' + hex
+    return hexMessage as string
+  }
+
   public async getAssetURL(
-    account,
+    account: Account,
     did: string,
     network: string | number,
     infuraProjectId?: string
@@ -52,7 +61,7 @@ export class Migration {
 
   public async getEncryptedFiles(
     providerUrl: string,
-    account,
+    account: Account,
     did: string,
     network: string | number
   ): Promise<string> {
@@ -87,16 +96,14 @@ export class Migration {
     baseTokenAddress: string,
     templateIndex: number,
     dtName: string,
-    dtSymbol: string,
-    url: string,
-    contractInstance?: Contract
+    dtSymbol: string
   ): Promise<any> {
     // const v3DDO = await getDDO(did)
     const ERC721FactoryContract = new this.web3.eth.Contract(
       ERC721Factory.abi as AbiItem[],
       ERC721FactoryAddress
     )
-    // console.log('ERC721FactoryContract.methods', ERC721FactoryContract.methods)
+
     const gasLimitDefault = this.GASLIMIT_DEFAULT
     let estGas
     try {
@@ -106,7 +113,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: url
+            tokenURI: ''
           },
           {
             strings: [dtName, dtSymbol],
@@ -155,9 +162,7 @@ export class Migration {
     baseTokenAddress: string,
     templateIndex: number,
     dtName: string,
-    dtSymbol: string,
-    dataURL: string,
-    contractInstance?: Contract
+    dtSymbol: string
   ): Promise<TransactionReceipt> {
     // const v3DDO = await getDDO(did)
     const ERC721FactoryContract = new this.web3.eth.Contract(
@@ -179,8 +184,7 @@ export class Migration {
       baseTokenAddress,
       templateIndex,
       dtName,
-      dtSymbol,
-      dataURL
+      dtSymbol
     )
     let tx
     try {
@@ -190,7 +194,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: dataURL
+            tokenURI: ''
           },
           {
             strings: [dtName, dtSymbol],
@@ -277,6 +281,10 @@ export class Migration {
     flags: string,
     data: string,
     dataHash: string,
+    asset: v4DDO,
+    nftSymbol: string,
+    marketURL: string,
+    signal?: AbortSignal,
     metadataProofs?: MetadataProof[]
   ) {
     const event = txReceipt.events.NFTCreated
@@ -298,21 +306,59 @@ export class Migration {
       dataHash,
       metadataProofs
     )
-    const tx = await tokenERC721.methods
-      .setMetaData(
-        metaDataState,
-        metaDataDecryptorUrl,
-        metaDataDecryptorAddress,
-        flags,
-        data,
-        dataHash,
-        metadataProofs
-      )
-      .send({
-        from: ownerAddress,
-        gas: estGas + 1,
-        gasPrice: await getFairGasPrice(this.web3)
+    // console.log(
+    //   'tokenERC721.methods.setMetaDataAndTokenURI',
+    //   tokenERC721.methods.setMetaDataAndTokenURI
+    // )
+    // const tx = await tokenERC721.methods
+    //   .setMetaData(
+    //     metaDataState,
+    //     metaDataDecryptorUrl,
+    //     metaDataDecryptorAddress,
+    //     flags,
+    //     data,
+    //     dataHash,
+    //     metadataProofs
+    //   )
+    //   .send({
+    //     from: ownerAddress,
+    //     gas: estGas + 1,
+    //     gasPrice: await getFairGasPrice(this.web3)
+    //   })
+    const encryptedDdo = await ProviderInstance.encrypt(
+      asset,
+      asset.services[0].serviceEndpoint,
+      signal
+    )
+
+    const metadataHash = this.getHash(JSON.stringify(asset))
+    const externalUrl = `${marketURL}/asset/${asset.id}`
+    const encodedMetadata = Buffer.from(
+      JSON.stringify({
+        name: asset.metadata.name,
+        symbol: nftSymbol,
+        description: asset.metadata.description,
+        external_url: externalUrl
       })
+    ).toString('base64')
+
+    const metadataAndTokenURI: MetadataAndTokenURI = {
+      metaDataState: 0,
+      metaDataDecryptorUrl,
+      metaDataDecryptorAddress,
+      flags,
+      data: encryptedDdo,
+      metaDataHash: '0x' + metadataHash,
+      tokenId: 1,
+      tokenURI: `data:application/json;base64,${encodedMetadata}`,
+      metadataProofs: []
+    }
+
+    const tx = await tokenERC721.methods.setMetadataAndTokenURI(
+      asset.nftAddress,
+      ownerAddress,
+      metadataAndTokenURI
+    )
     return tx
   }
 
@@ -322,7 +368,7 @@ export class Migration {
     nftName: string,
     nftSymbol: string,
     ownerAddress: string,
-    ownerAccount,
+    ownerAccount: Account,
     cap: number,
     rate: string,
     flags: string,
@@ -335,19 +381,13 @@ export class Migration {
     metaDataDecryptorAddress: string,
     providerUrl: string,
     metadataCacheUri: string,
-    templateIndex,
-    dtName,
-    dtSymbol,
-    network,
-    metadataProofs?: MetadataProof[],
-    contractInstance?: Contract
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
+    network: string | number,
+    marketURL: string,
+    signal?: AbortSignal
   ) {
-    const dataURL = await this.getAssetURL(
-      this.web3,
-      ownerAccount,
-      did,
-      network
-    )
     let txReceipt
     try {
       txReceipt = await this.publishFixedRateAsset(
@@ -365,8 +405,7 @@ export class Migration {
         baseTokenAddress,
         templateIndex,
         dtName,
-        dtSymbol,
-        dataURL
+        dtSymbol
       )
     } catch (e) {
       console.log('publishFixedRateAsset Error', e)
@@ -374,6 +413,13 @@ export class Migration {
     const nftAddress = txReceipt.events.NFTCreated.returnValues.newTokenAddress
     const erc20Address =
       txReceipt.events.TokenCreated.returnValues.newTokenAddress
+
+    const encryptedFiles = await this.getEncryptedFiles(
+      providerUrl,
+      ownerAccount,
+      did,
+      network
+    )
     const ddo = await getAndConvertDDO(
       did,
       nftAddress,
@@ -382,7 +428,8 @@ export class Migration {
       providerUrl,
       this.web3,
       ownerAccount,
-      network
+      network,
+      encryptedFiles
     )
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
@@ -398,7 +445,11 @@ export class Migration {
         metaDataDecryptorAddress,
         flags,
         encryptedDdo,
-        dataHash
+        dataHash,
+        ddo,
+        nftSymbol,
+        marketURL,
+        signal
       )
     } catch (e) {
       console.log('Error', e)

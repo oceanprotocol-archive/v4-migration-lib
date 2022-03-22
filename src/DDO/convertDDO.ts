@@ -12,8 +12,9 @@ export async function convertDDO(
   erc20Address: string | '',
   providerUrl: string,
   web3: Web3,
-  account,
-  network: string
+  account: Account,
+  network: string | number,
+  encryptedFiles
 ): Promise<v4DDO> {
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
 
@@ -40,14 +41,6 @@ export async function convertDDO(
         v3DDO.service[0].attributes.additionalInformation.termsAndConditions
     }
   }
-
-  const migration = new Migration(web3)
-  const encryptedFiles = await migration.getEncryptedFiles(
-    providerUrl,
-    account,
-    did,
-    network
-  )
 
   const newService: Service = {
     id: did,
@@ -81,8 +74,9 @@ export async function getAndConvertDDO(
   metadataCacheUri: string,
   providerUrl: string,
   web3: Web3,
-  account,
-  network: string
+  account: Account,
+  network: string | number,
+  encryptedFiles
 ): Promise<v4DDO> {
   const v3DDO: v3DDO = await getDDO(did, metadataCacheUri)
 
@@ -94,7 +88,8 @@ export async function getAndConvertDDO(
     providerUrl,
     web3,
     account,
-    network
+    network,
+    encryptedFiles
   )
 
   return v4DDO
