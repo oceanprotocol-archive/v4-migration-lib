@@ -1,4 +1,4 @@
-import { DDO as v3DDO } from '../v3'
+import { Account, DDO as v3DDO } from '../v3'
 import { DDO as v4DDO } from '../@types/DDO/DDO'
 import { getDDO } from './importDDO'
 import { Metadata, Service, ServiceComputeOptions } from '../@types'
@@ -11,7 +11,9 @@ export async function convertDDO(
   nftAddress: string | '',
   erc20Address: string | '',
   providerUrl: string,
-  web3: Web3
+  web3: Web3,
+  account,
+  network: string
 ): Promise<v4DDO> {
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
 
@@ -41,8 +43,10 @@ export async function convertDDO(
 
   const migration = new Migration(web3)
   const encryptedFiles = await migration.getEncryptedFiles(
-    'test.com',
-    providerUrl
+    providerUrl,
+    account,
+    did,
+    network
   )
 
   const newService: Service = {
@@ -76,7 +80,9 @@ export async function getAndConvertDDO(
   erc20Address: string,
   metadataCacheUri: string,
   providerUrl: string,
-  web3: Web3
+  web3: Web3,
+  account,
+  network: string
 ): Promise<v4DDO> {
   const v3DDO: v3DDO = await getDDO(did, metadataCacheUri)
 
@@ -86,7 +92,9 @@ export async function getAndConvertDDO(
     nftAddress,
     erc20Address,
     providerUrl,
-    web3
+    web3,
+    account,
+    network
   )
 
   return v4DDO

@@ -13,18 +13,6 @@ import { Ocean as V3Ocean } from '../../src/v3/ocean/Ocean'
 import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
 import { FileMetadata } from '../@types'
 
-export async function getEncryptedFiles(
-  files: FileMetadata[],
-  providerUrl: string
-): Promise<string> {
-  try {
-    // https://github.com/oceanprotocol/provider/blob/v4main/API.md#encrypt-endpoint
-    const response = await ProviderInstance.encrypt(files, providerUrl)
-    return response
-  } catch (error) {
-    console.error('Error parsing json: ' + error.message)
-  }
-}
 export interface MetadataProof {
   validatorAddress?: string
   r?: string
@@ -43,7 +31,6 @@ export class Migration {
   }
 
   public async getAssetURL(
-    web3: Web3,
     account,
     did: string,
     network: string | number,
@@ -54,7 +41,7 @@ export class Migration {
     if (network === 'v4-testing') return 'http://oceanprotocol.com/test'
     try {
       const config = new ConfigHelper().getConfig(network, infuraProjectId)
-      config.web3Provider = web3
+      config.web3Provider = this.web3
       const ocean = await V3Ocean.getInstance(config)
       urlResponse = await ocean.provider.getAssetURL(account, did, 1)
     } catch (error) {
@@ -64,9 +51,12 @@ export class Migration {
   }
 
   public async getEncryptedFiles(
-    assetURL: string,
-    providerUrl: string
+    providerUrl: string,
+    account,
+    did: string,
+    network: string | number
   ): Promise<string> {
+    const assetURL = await this.getAssetURL(account, did, network)
     const file = [
       {
         type: 'url',
@@ -75,7 +65,7 @@ export class Migration {
       }
     ]
     try {
-      const response = await getEncryptedFiles(file, providerUrl)
+      const response = await ProviderInstance.encrypt(file, providerUrl)
       return response
     } catch (error) {
       console.error('Error parsing json: ' + error.message)
@@ -390,7 +380,9 @@ export class Migration {
       erc20Address,
       metadataCacheUri,
       providerUrl,
-      this.web3
+      this.web3,
+      ownerAccount,
+      network
     )
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)

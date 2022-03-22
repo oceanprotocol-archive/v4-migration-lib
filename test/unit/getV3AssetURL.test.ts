@@ -10,26 +10,39 @@ import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
 import { TestContractHandler } from '../V3TestContractHandler'
 import { LoggerInstance } from '../../src/v3/utils'
 import { Migration } from '../../src/migration/FixedRateExchangeMigration'
+import { DDO as v3DDO } from '../../src/v3'
+import { DDO as v4DDO } from '../../src/@types/DDO/DDO'
+import { getDDO } from '../../src/DDO/importDDO'
+import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 
 const web3 = new Web3('http://127.0.0.1:8545')
 const url = 'https://people.sc.fsu.edu/~jburkardt/data/csv/homes.csv'
 const v4ProviderUrl = 'https://v4.provider.ropsten.oceanprotocol.com'
+const v3ProviderUri = 'http://localhost:8030'
+const network = 'development'
+const metadataCacheUri = 'https://aquarius.oceanprotocol.com'
+const did1 = 'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38'
+const did2 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
+const did3 = 'did:op:50C48d3eE0Ed47479d3e2599FAe0076965cBD39c'
+const nftAddress = ''
+const erc20Address = ''
 
-describe('Get V3 URL flow', () => {
-  let owner: Account
-  let alice: Account
-  let ddo
-  let asset
-  let assetInvalidNoName
-  let contracts: TestContractHandler
-  let datatoken: DataTokens
-  let tokenAddress: string
-  let service1: ServiceAccess
-  let price: string
-  let ocean: Ocean
-  let data
-  let blob
-  let migration
+describe('V3 flow', () => {
+  let owner: Account,
+    alice: Account,
+    ddo,
+    did: string,
+    asset,
+    assetInvalidNoName,
+    contracts: TestContractHandler,
+    datatoken: DataTokens,
+    tokenAddress: string,
+    service1: ServiceAccess,
+    price: string,
+    ocean: Ocean,
+    data,
+    blob,
+    migration
 
   it('Initialize Ocean contracts v3', async () => {
     contracts = new TestContractHandler(
@@ -66,6 +79,54 @@ describe('Get V3 URL flow', () => {
       'DTA'
     )
     assert(tokenAddress != null)
+  })
+
+  it('Converts 1st DDO', async () => {
+    const ddo1: v4DDO = await getAndConvertDDO(
+      did1,
+      nftAddress,
+      erc20Address,
+      metadataCacheUri,
+      v3ProviderUri,
+      web3,
+      alice,
+      network
+    )
+    assert(
+      ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
+    )
+    assert(ddo1.metadata.type === 'dataset')
+  })
+  it('Converts 2nd DDO', async () => {
+    const ddo2: v4DDO = await getAndConvertDDO(
+      did2,
+      nftAddress,
+      erc20Address,
+      metadataCacheUri,
+      v3ProviderUri,
+      web3,
+      alice,
+      network
+    )
+    assert(
+      ddo2.metadata.name ===
+        'Product Pages of 1’044’709 Products on Amazon.com (processed data)'
+    )
+    assert(ddo2.metadata.type === 'dataset')
+  })
+  it('Converts 3rd DDO', async () => {
+    const ddo3: v4DDO = await getAndConvertDDO(
+      did3,
+      nftAddress,
+      erc20Address,
+      metadataCacheUri,
+      v3ProviderUri,
+      web3,
+      alice,
+      network
+    )
+    assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')
+    assert(ddo3.metadata.type === 'algorithm')
   })
 
   it('Generates metadata', async () => {
@@ -111,6 +172,7 @@ describe('Get V3 URL flow', () => {
       console.log('error', error)
     }
     assert(ddo.dataToken === tokenAddress)
+    did = ddo.id
     let storeTx
     try {
       storeTx = await ocean.onChainMetadata.publish(ddo.id, ddo, alice.getId())
@@ -124,7 +186,6 @@ describe('Get V3 URL flow', () => {
 
   it('Alice tries to get the asset URL from the V3 provider', async () => {
     try {
-      const did = ddo.id
       const urlResponse = await ocean.provider.getAssetURL(alice, did, 1)
       assert(urlResponse !== undefined, 'Failed to get asset url')
       assert(urlResponse === url, 'Wrong or invalid url returned')
@@ -134,13 +195,7 @@ describe('Get V3 URL flow', () => {
   })
   it('Alice tries to get the asset URL using the migration', async () => {
     try {
-      const did = ddo.id
-      const urlResponse = await migration.getAssetURL(
-        web3,
-        alice,
-        did,
-        'development'
-      )
+      const urlResponse = await migration.getAssetURL(alice, did, network)
       assert(urlResponse !== undefined, 'Failed to get asset url')
       assert(urlResponse === url, 'Wrong or invalid url returned')
     } catch (error) {
@@ -149,12 +204,12 @@ describe('Get V3 URL flow', () => {
   })
   it('Alice tries to get the encrypted Files using the migration', async () => {
     try {
-      const providerUrl = ocean.provider.url
       const encryptedFiles = await migration.getEncryptedFiles(
-        url,
-        v4ProviderUrl
+        v4ProviderUrl,
+        alice,
+        did,
+        network
       )
-      console.log('encryptedFiles', encryptedFiles)
       assert(encryptedFiles !== undefined, 'Failed to get asset url')
     } catch (error) {
       assert(error === null, 'Order should not throw error')

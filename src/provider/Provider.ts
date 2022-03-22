@@ -146,7 +146,6 @@ export class Provider {
     providerUri: string,
     signal?: AbortSignal
   ): Promise<string> {
-    console.log({ data, providerUri })
     const providerEndpoints = await this.getEndpoints(providerUri)
     const serviceEndpoints = await this.getServiceEndpoints(
       providerUri,
