@@ -2,7 +2,10 @@ import { assert, expect } from 'chai'
 import { AbiItem } from 'web3-utils/types'
 import { TestContractHandler } from '../TestContractHandler'
 import Web3 from 'web3'
-import { Migration } from '../../src/migration/FixedRateExchangeMigration'
+import {
+  Migration,
+  DispenserData
+} from '../../src/migration/FixedRateExchangeMigration'
 import Dispenser from './../../src/artifacts/Dispenser.json'
 import IERC20 from './../../src/artifacts/IERC20.json'
 import ERC721Factory from './../../src/artifacts/ERC721Factory.json'
@@ -15,6 +18,7 @@ import OPFCommunityFeeCollector from './../../src/artifacts/OPFCommunityFeeColle
 import PoolTemplate from './../../src/artifacts/BPool.json'
 import { Account } from '../../src/v3'
 import { getAndConvertDDO } from '../../src/DDO/convertDDO'
+import { ZERO_ADDRESS } from '../../src/utils/Constants'
 
 const web3 = new Web3('http://127.0.0.1:8545')
 const providerUrl = 'https://v4.provider.rinkeby.oceanprotocol.com/'
@@ -55,7 +59,8 @@ describe('Migration test', () => {
     stakingAddress: string,
     factory721Address: string,
     fixedRateAddress: string,
-    txReceipt: any
+    txReceipt: any,
+    dispenserAddress: string
 
   it('should initiate Migration instance', async () => {
     migration = new Migration(web3)
@@ -120,6 +125,7 @@ describe('Migration test', () => {
       stakingAddress = contracts.sideStakingAddress
       factory721Address = contracts.factory721Address
       fixedRateAddress = contracts.fixedRateAddress
+      dispenserAddress = contracts.dispenserAddress
     } catch (error) {
       console.log('Deploy Contracts error', error)
     }
@@ -132,6 +138,7 @@ describe('Migration test', () => {
     expect(stakingAddress != undefined)
     expect(factory721Address != undefined)
     expect(fixedRateAddress != undefined)
+    expect(dispenserAddress != dispenserAddress)
   })
 
   it('should publish Fixed Rate Asset', async () => {
@@ -229,6 +236,49 @@ describe('Migration test', () => {
         dtSymbol,
         network,
         marketURL
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
+
+    expect(response.txReceipt.events.NFTCreated != null)
+    expect(response.txReceipt.events.TokenCreated != null)
+    expect(response.txReceipt.events.NewFixedRate != null)
+
+    expect(response.txReceipt2.events.MetadataCreated != null)
+  })
+
+  it('should migrate the free Asset', async () => {
+    let response
+    let account: Account
+    let dispenserData: DispenserData = {
+      dispenserAddress: dispenserAddress,
+      maxTokens: web3.utils.toWei('1'),
+      maxBalance: web3.utils.toWei('1'),
+      withMint: true,
+      allowedSwapper: ZERO_ADDRESS
+    }
+    try {
+      response = await migration.migrateFreeAsset(
+        did,
+        factory721Address,
+        nftName,
+        nftSymbol,
+        v3DtOwner,
+        account,
+        cap,
+        flags,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        1,
+        '0x123',
+        providerUrl,
+        metadataCacheUri,
+        templateIndex,
+        dtName,
+        dtSymbol,
+        network,
+        dispenserData
       )
     } catch (e) {
       console.log('Error', e)

@@ -433,6 +433,28 @@ export class TestContractHandler {
         return contract.options.address
       })
 
+    // DEPLOY Dispenser
+    estGas = await this.Dispenser.deploy({
+      data: this.DispenserBytecode,
+      arguments: [this.routerAddress]
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+    // deploy the contract and get it's address
+    this.dispenserAddress = await this.Dispenser.deploy({
+      data: this.DispenserBytecode,
+      arguments: [this.routerAddress]
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
+
     // DEPLOY ERC721 FACTORY
     estGas = await this.ERC721Factory.deploy({
       data: this.ERC721FactoryBytecode,
@@ -640,6 +662,9 @@ export class TestContractHandler {
       .send({ from: owner })
     await RouterContract.methods
       .addFixedRateContract(this.fixedRateAddress)
+      .send({ from: owner })
+    await RouterContract.methods
+      .addDispenserContract(this.dispenserAddress)
       .send({ from: owner })
 
     await RouterContract.methods

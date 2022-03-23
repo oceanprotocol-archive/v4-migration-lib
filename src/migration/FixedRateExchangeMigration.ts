@@ -22,6 +22,14 @@ export interface MetadataProof {
   v?: number
 }
 
+export interface DispenserData {
+  dispenserAddress: string
+  maxTokens: string
+  maxBalance: string
+  withMint: boolean
+  allowedSwapper: string
+}
+
 export class Migration {
   public GASLIMIT_DEFAULT = 1000000
   public web3: Web3
@@ -254,6 +262,141 @@ export class Migration {
     return tx
   }
 
+  public async estGaspublishFreeAsset(
+    description: string,
+    ERC721FactoryAddress: string,
+    nftName: string,
+    nftSymbol: string,
+    ownerAddress: string,
+    cap: number,
+    publishingMarketFeeAddress: string,
+    publishingMarketTokenAddress: string,
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
+    dispenserData: DispenserData
+  ): Promise<number> {
+    const ERC721FactoryContract = new this.web3.eth.Contract(
+      ERC721Factory.abi as AbiItem[],
+      ERC721FactoryAddress
+    )
+    const encodedMetadata = Buffer.from(
+      JSON.stringify({
+        name: nftName,
+        symbol: nftSymbol,
+        description: description
+      })
+    ).toString('base64')
+    const gasLimitDefault = this.GASLIMIT_DEFAULT
+    let estGas
+    try {
+      estGas = await ERC721FactoryContract.methods
+        .createNftWithErc20WithDispenser(
+          {
+            name: nftName,
+            symbol: nftSymbol,
+            templateIndex,
+            tokenURI: `data:application/json;base64,${encodedMetadata}`
+          },
+          {
+            strings: [dtName, dtSymbol],
+            templateIndex,
+            addresses: [
+              ownerAddress,
+              ownerAddress,
+              publishingMarketFeeAddress,
+              publishingMarketTokenAddress
+            ],
+            uints: [cap, 0],
+            bytess: []
+          },
+          dispenserData
+        )
+        .estimateGas({ from: ownerAddress }, (err, estGas) =>
+          err ? gasLimitDefault : estGas
+        )
+    } catch (error) {
+      console.log('error', error)
+    }
+
+    return estGas
+  }
+
+  public async publishFreeAsset(
+    description: string,
+    ERC721FactoryAddress: string,
+    nftName: string,
+    nftSymbol: string,
+    ownerAddress: string,
+    cap: number,
+    publishingMarketFeeAddress: string,
+    publishingMarketTokenAddress: string,
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
+    dispenserData: DispenserData
+  ): Promise<TransactionReceipt> {
+    const ERC721FactoryContract = new this.web3.eth.Contract(
+      ERC721Factory.abi as AbiItem[],
+      ERC721FactoryAddress
+    )
+    const estGas = await this.estGaspublishFreeAsset(
+      description,
+      ERC721FactoryAddress,
+      nftName,
+      nftSymbol,
+      ownerAddress,
+      cap,
+      publishingMarketFeeAddress,
+      publishingMarketTokenAddress,
+      templateIndex,
+      dtName,
+      dtSymbol,
+      dispenserData
+    )
+    let tx
+    const encodedMetadata = Buffer.from(
+      JSON.stringify({
+        name: nftName,
+        symbol: nftSymbol,
+        description: description
+      })
+    ).toString('base64')
+    try {
+      tx = await ERC721FactoryContract.methods
+        .createNftWithErc20WithDispenser(
+          {
+            name: nftName,
+            symbol: nftSymbol,
+            templateIndex,
+            tokenURI: `data:application/json;base64,${encodedMetadata}`
+          },
+          {
+            strings: [dtName, dtSymbol],
+            templateIndex,
+            addresses: [
+              ownerAddress,
+              ownerAddress,
+              publishingMarketFeeAddress,
+              publishingMarketTokenAddress
+            ],
+            uints: [cap, 0],
+            bytess: []
+          },
+          dispenserData
+        )
+        .send({
+          from: ownerAddress,
+          gas: estGas + 1,
+          gasPrice: await getFairGasPrice(this.web3)
+        })
+    } catch (error) {
+      console.log('error', error)
+    }
+
+    return tx
+  }
+
   public async estGasUpdateMetadata(
     ownerAddress: string,
     txReceipt: any,
@@ -425,7 +568,94 @@ export class Migration {
     )
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
-    // const metaDataDecryptorAddress1 = await provider.getEndpointURL[0]
+    const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
+
+    let txReceipt2
+    try {
+      txReceipt2 = await this.updateMetadata(
+        ownerAddress,
+        txReceipt,
+        metaDataState,
+        providerUrl,
+        metaDataDecryptorAddress,
+        flags,
+        encryptedDdo,
+        dataHash,
+        signal
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
+    return { txReceipt, txReceipt2 }
+  }
+
+  public async migrateFreeAsset(
+    v3Did: string,
+    ERC721FactoryAddress: string,
+    nftName: string,
+    nftSymbol: string,
+    ownerAddress: string,
+    ownerAccount: Account,
+    cap: number,
+    flags: string,
+    publishingMarketFeeAddress: string,
+    publishingMarketTokenAddress: string,
+    metaDataState: number,
+    metaDataDecryptorAddress: string,
+    providerUrl: string,
+    metadataCacheUri: string,
+    templateIndex: number,
+    dtName: string,
+    dtSymbol: string,
+    network: string | number,
+    dispenserData: DispenserData,
+    signal?: AbortSignal
+  ) {
+    let txReceipt
+    const v3DDO = await getDDO(v3Did, metadataCacheUri)
+    const description =
+      v3DDO.service[0].attributes.additionalInformation.description
+
+    try {
+      txReceipt = await this.publishFreeAsset(
+        description,
+        ERC721FactoryAddress,
+        nftName,
+        nftSymbol,
+        ownerAddress,
+        cap,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        templateIndex,
+        dtName,
+        dtSymbol,
+        dispenserData
+      )
+    } catch (e) {
+      console.log('publishFixedRateAsset Error', e)
+    }
+    const nftAddress = txReceipt.events.NFTCreated.returnValues.newTokenAddress
+    const erc20Address =
+      txReceipt.events.TokenCreated.returnValues.newTokenAddress
+
+    const encryptedFiles = await this.getEncryptedFiles(
+      providerUrl,
+      ownerAccount,
+      v3Did,
+      network
+    )
+    const v4Did = await this.generateDidv4(nftAddress)
+
+    const ddo = await getAndConvertDDO(
+      v3Did,
+      v4Did,
+      nftAddress,
+      erc20Address,
+      metadataCacheUri,
+      encryptedFiles
+    )
+    const provider = await ProviderInstance
+    const encryptedDdo = await provider.encrypt(ddo, providerUrl)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
 
     let txReceipt2
