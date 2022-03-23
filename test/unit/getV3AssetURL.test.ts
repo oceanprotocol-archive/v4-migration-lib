@@ -59,7 +59,6 @@ describe('V3 flow', () => {
     ocean = await Ocean.getInstance(config)
     owner = (await ocean.accounts.list())[0]
     alice = (await ocean.accounts.list())[1]
-    console.log('Alice', alice)
     data = { t: 1, url: config.metadataCacheUri }
     blob = JSON.stringify(data)
     await contracts.deployContracts(owner.getId())
