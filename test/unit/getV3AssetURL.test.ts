@@ -26,6 +26,8 @@ const did2 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
 const did3 = 'did:op:50C48d3eE0Ed47479d3e2599FAe0076965cBD39c'
 const nftAddress = ''
 const erc20Address = ''
+const encryptedFiles =
+  '0x04f91f187587d76605c40d0ab6f92d1e75ee1a4f97bdc60ed0368884082240c20d03e799e1f54e038f953ec508454631b0a4c24fcfd9d8fb9657d4d5f6945f2c4c91eeb9a40c5f6580a7c785c44420223fd2cac6ad7e34403e5047b394706075653d359b46480fdd365d286f37ea460b9b0c9d9d7787210fbe5a0bab66de96d3a237d599d6876f547bdf996445498cb6f70fea47c9ec811c4a9a34dfc498f628583e5221c119'
 
 describe('V3 flow', () => {
   let owner: Account,
@@ -91,7 +93,8 @@ describe('V3 flow', () => {
       v3ProviderUri,
       web3,
       alice,
-      network
+      network,
+      encryptedFiles
     )
     assert(
       ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
@@ -107,7 +110,8 @@ describe('V3 flow', () => {
       v3ProviderUri,
       web3,
       alice,
-      network
+      network,
+      encryptedFiles
     )
     assert(
       ddo2.metadata.name ===
@@ -124,7 +128,8 @@ describe('V3 flow', () => {
       v3ProviderUri,
       web3,
       alice,
-      network
+      network,
+      encryptedFiles
     )
     assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')
     assert(ddo3.metadata.type === 'algorithm')

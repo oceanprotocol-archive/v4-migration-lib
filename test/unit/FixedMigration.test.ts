@@ -61,45 +61,67 @@ describe('Migration test', () => {
   })
 
   it('should deploy contracts', async () => {
-    contracts = new TestContractHandler(
-      web3,
-      ERC721Template.abi as AbiItem[],
-      ERC20Template.abi as AbiItem[],
-      PoolTemplate.abi as AbiItem[],
-      ERC721Factory.abi as AbiItem[],
-      Router.abi as AbiItem[],
-      SideStaking.abi as AbiItem[],
-      FixedRate.abi as AbiItem[],
-      Dispenser.abi as AbiItem[],
-      OPFCommunityFeeCollector.abi as AbiItem[],
+    try {
+      contracts = new TestContractHandler(
+        web3,
+        ERC721Template.abi as AbiItem[],
+        ERC20Template.abi as AbiItem[],
+        PoolTemplate.abi as AbiItem[],
+        ERC721Factory.abi as AbiItem[],
+        Router.abi as AbiItem[],
+        SideStaking.abi as AbiItem[],
+        FixedRate.abi as AbiItem[],
+        Dispenser.abi as AbiItem[],
+        OPFCommunityFeeCollector.abi as AbiItem[],
 
-      ERC721Template.bytecode,
-      ERC20Template.bytecode,
-      PoolTemplate.bytecode,
-      ERC721Factory.bytecode,
-      Router.bytecode,
-      SideStaking.bytecode,
-      FixedRate.bytecode,
-      Dispenser.bytecode,
-      OPFCommunityFeeCollector.bytecode
-    )
-    await contracts.getAccounts()
-    v3DtOwner = contracts.accounts[0]
-    user1 = contracts.accounts[1]
-    user2 = contracts.accounts[2]
-    daemon = contracts.accounts[9]
+        ERC721Template.bytecode,
+        ERC20Template.bytecode,
+        PoolTemplate.bytecode,
+        ERC721Factory.bytecode,
+        Router.bytecode,
+        SideStaking.bytecode,
+        FixedRate.bytecode,
+        Dispenser.bytecode,
+        OPFCommunityFeeCollector.bytecode
+      )
+    } catch (error) {
+      console.log('contracts error', error)
+    }
 
-    await contracts.deployContracts(v3DtOwner, daemon, Router.abi as AbiItem[])
-    //console.log(contracts)
-    v3dt1Address = contracts.v3dt1Address
-    v3dt2Address = contracts.v3dt2Address
-    v3pool1Address = contracts.v3pool1Address
-    v3pool2Address = contracts.v3pool2Address
-    migrationAddress = contracts.migrationAddress
-    oceanAddress = contracts.oceanAddress
-    stakingAddress = contracts.sideStakingAddress
-    factory721Address = contracts.factory721Address
-    fixedRateAddress = contracts.fixedRateAddress
+    try {
+      await contracts.getAccounts()
+      v3DtOwner = contracts.accounts[0]
+      user1 = contracts.accounts[1]
+      user2 = contracts.accounts[2]
+      daemon = contracts.accounts[9]
+    } catch (error) {
+      console.log('Get Accounts error', error)
+    }
+    console.log('v3DtOwner', v3DtOwner)
+    expect(v3DtOwner != undefined)
+    expect(user1 != undefined)
+    expect(user2 != undefined)
+    expect(daemon != undefined)
+
+    try {
+      await contracts.deployContracts(
+        v3DtOwner,
+        daemon,
+        Router.abi as AbiItem[]
+      )
+      //console.log(contracts)
+      v3dt1Address = contracts.v3dt1Address
+      v3dt2Address = contracts.v3dt2Address
+      v3pool1Address = contracts.v3pool1Address
+      v3pool2Address = contracts.v3pool2Address
+      migrationAddress = contracts.migrationAddress
+      oceanAddress = contracts.oceanAddress
+      stakingAddress = contracts.sideStakingAddress
+      factory721Address = contracts.factory721Address
+      fixedRateAddress = contracts.fixedRateAddress
+    } catch (error) {
+      console.log('Deploy Contracts error', error)
+    }
   })
 
   it('should publish Fixed Rate Asset', async () => {

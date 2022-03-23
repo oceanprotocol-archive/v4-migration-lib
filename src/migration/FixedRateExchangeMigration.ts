@@ -306,10 +306,7 @@ export class Migration {
       dataHash,
       metadataProofs
     )
-    // console.log(
-    //   'tokenERC721.methods.setMetaDataAndTokenURI',
-    //   tokenERC721.methods.setMetaDataAndTokenURI
-    // )
+
     // const tx = await tokenERC721.methods
     //   .setMetaData(
     //     metaDataState,
@@ -320,11 +317,7 @@ export class Migration {
     //     dataHash,
     //     metadataProofs
     //   )
-    //   .send({
-    //     from: ownerAddress,
-    //     gas: estGas + 1,
-    //     gasPrice: await getFairGasPrice(this.web3)
-    //   })
+
     const encryptedDdo = await ProviderInstance.encrypt(
       asset,
       asset.services[0].serviceEndpoint,
@@ -353,12 +346,19 @@ export class Migration {
       tokenURI: `data:application/json;base64,${encodedMetadata}`,
       metadataProofs: []
     }
+    let tx
+    try {
+      tx = await tokenERC721.methods
+        .setMetaDataAndTokenURI(metadataAndTokenURI)
+        .send({
+          from: ownerAddress,
+          gas: estGas + 1,
+          gasPrice: await getFairGasPrice(this.web3)
+        })
+    } catch (error) {
+      console.log('setMetaDataAndTokenURI ERROR', error)
+    }
 
-    const tx = await tokenERC721.methods.setMetadataAndTokenURI(
-      asset.nftAddress,
-      ownerAddress,
-      metadataAndTokenURI
-    )
     return tx
   }
 
@@ -420,6 +420,7 @@ export class Migration {
       did,
       network
     )
+    console.log('encryptedFiles', encryptedFiles)
     const ddo = await getAndConvertDDO(
       did,
       nftAddress,
@@ -431,9 +432,12 @@ export class Migration {
       network,
       encryptedFiles
     )
+    console.log('ddo', ddo)
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
+    console.log('encryptedDdo', encryptedDdo)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
+    console.log('dataHash', dataHash)
 
     let txReceipt2
     try {
