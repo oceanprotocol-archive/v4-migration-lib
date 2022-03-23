@@ -6,6 +6,7 @@ import ERC721Factory from '../artifacts/ERC721Factory.json'
 import ERC721Template from '../artifacts/ERC721Template.json'
 import { getFairGasPrice } from '../utils'
 import { getAndConvertDDO } from '../DDO/convertDDO'
+import { getDDO } from '../DDO/importDDO'
 import ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
 import { SHA256 } from 'crypto-js'
@@ -90,6 +91,7 @@ export class Migration {
 
   public async estGasPublishFixedRateAsset(
     did: string,
+    description: string,
     ERC721FactoryAddress: string,
     nftName: string,
     nftSymbol: string,
@@ -105,7 +107,6 @@ export class Migration {
     dtName: string,
     dtSymbol: string
   ): Promise<any> {
-    // const v3DDO = await getDDO(did)
     const ERC721FactoryContract = new this.web3.eth.Contract(
       ERC721Factory.abi as AbiItem[],
       ERC721FactoryAddress
@@ -113,6 +114,13 @@ export class Migration {
 
     const gasLimitDefault = this.GASLIMIT_DEFAULT
     let estGas
+    const encodedMetadata = Buffer.from(
+      JSON.stringify({
+        name: nftName,
+        symbol: nftSymbol,
+        description: description
+      })
+    ).toString('base64')
     try {
       estGas = await ERC721FactoryContract.methods
         .createNftWithErc20WithFixedRate(
@@ -120,7 +128,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: ''
+            tokenURI: `data:application/json;base64,${encodedMetadata}`
           },
           {
             strings: [dtName, dtSymbol],
@@ -156,6 +164,7 @@ export class Migration {
 
   public async publishFixedRateAsset(
     did: string,
+    description: string,
     ERC721FactoryAddress: string,
     nftName: string,
     nftSymbol: string,
@@ -171,13 +180,13 @@ export class Migration {
     dtName: string,
     dtSymbol: string
   ): Promise<TransactionReceipt> {
-    // const v3DDO = await getDDO(did)
     const ERC721FactoryContract = new this.web3.eth.Contract(
       ERC721Factory.abi as AbiItem[],
       ERC721FactoryAddress
     )
     const estGas = await this.estGasPublishFixedRateAsset(
       did,
+      description,
       ERC721FactoryAddress,
       nftName,
       nftSymbol,
@@ -194,6 +203,13 @@ export class Migration {
       dtSymbol
     )
     let tx
+    const encodedMetadata = Buffer.from(
+      JSON.stringify({
+        name: nftName,
+        symbol: nftSymbol,
+        description: description
+      })
+    ).toString('base64')
     try {
       tx = await ERC721FactoryContract.methods
         .createNftWithErc20WithFixedRate(
@@ -201,7 +217,7 @@ export class Migration {
             name: nftName,
             symbol: nftSymbol,
             templateIndex,
-            tokenURI: ''
+            tokenURI: `data:application/json;base64,${encodedMetadata}`
           },
           {
             strings: [dtName, dtSymbol],
@@ -288,15 +304,11 @@ export class Migration {
     flags: string,
     data: string,
     dataHash: string,
-    asset: v4DDO,
-    nftSymbol: string,
-    marketURL: string,
     signal?: AbortSignal,
     metadataProofs?: MetadataProof[]
   ) {
     const event = txReceipt.events.NFTCreated
     const tokenAddress = event.returnValues.newTokenAddress
-    console.log('tokenAddress', tokenAddress)
     if (!metadataProofs) metadataProofs = []
 
     const tokenERC721 = new this.web3.eth.Contract(
@@ -315,38 +327,9 @@ export class Migration {
       metadataProofs
     )
 
-    const encryptedDdo = await ProviderInstance.encrypt(
-      asset,
-      asset.services[0].serviceEndpoint,
-      signal
-    )
-
-    const metadataHash = this.getHash(JSON.stringify(asset))
-    const externalUrl = `${marketURL}/asset/${asset.id}`
-    const encodedMetadata = Buffer.from(
-      JSON.stringify({
-        name: asset.metadata.name,
-        symbol: nftSymbol,
-        description: asset.metadata.description,
-        external_url: externalUrl
-      })
-    ).toString('base64')
-
-    const metadataAndTokenURI: MetadataAndTokenURI = {
-      metaDataState: 0,
-      metaDataDecryptorUrl,
-      metaDataDecryptorAddress,
-      flags,
-      data: encryptedDdo,
-      metaDataHash: '0x' + metadataHash,
-      tokenId: 1,
-      tokenURI: `data:application/json;base64,${encodedMetadata}`,
-      metadataProofs: []
-    }
     let tx
     try {
       tx = await tokenERC721.methods
-        // .setMetaDataAndTokenURI(metadataAndTokenURI)
         .setMetaData(
           metaDataState,
           metaDataDecryptorUrl,
@@ -364,7 +347,6 @@ export class Migration {
     } catch (error) {
       console.log('setMetaDataAndTokenURI ERROR', error)
     }
-
     return tx
   }
 
@@ -395,9 +377,14 @@ export class Migration {
     signal?: AbortSignal
   ) {
     let txReceipt
+    const v3DDO = await getDDO(v3Did, metadataCacheUri)
+    const description =
+      v3DDO.service[0].attributes.additionalInformation.description
+
     try {
       txReceipt = await this.publishFixedRateAsset(
         v3Did,
+        description,
         ERC721FactoryAddress,
         nftName,
         nftSymbol,
@@ -438,6 +425,7 @@ export class Migration {
     )
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
+    // const metaDataDecryptorAddress1 = await provider.getEndpointURL[0]
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
 
     let txReceipt2
@@ -451,9 +439,6 @@ export class Migration {
         flags,
         encryptedDdo,
         dataHash,
-        ddo,
-        nftSymbol,
-        marketURL,
         signal
       )
     } catch (e) {

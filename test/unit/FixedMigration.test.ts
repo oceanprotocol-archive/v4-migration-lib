@@ -37,6 +37,7 @@ const dtName = 'Test Datatoken'
 const dtSymbol = 'TEST-DT'
 const network = 'v4-testing'
 const dataURL = 'http://oceanprotocol.com/test'
+const description = 'Example description with lots of detail...'
 
 describe('Migration test', () => {
   let v3DtOwner: string,
@@ -137,6 +138,7 @@ describe('Migration test', () => {
     try {
       txReceipt = await migration.publishFixedRateAsset(
         did,
+        description,
         factory721Address,
         nftName,
         nftSymbol,
