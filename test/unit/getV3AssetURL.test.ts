@@ -87,13 +87,10 @@ describe('V3 flow', () => {
   it('Converts 1st DDO', async () => {
     const ddo1: v4DDO = await getAndConvertDDO(
       did1,
+      '1234567890',
       nftAddress,
       erc20Address,
       metadataCacheUri,
-      v3ProviderUri,
-      web3,
-      alice,
-      network,
       encryptedFiles
     )
     assert(
@@ -104,13 +101,10 @@ describe('V3 flow', () => {
   it('Converts 2nd DDO', async () => {
     const ddo2: v4DDO = await getAndConvertDDO(
       did2,
+      '1234567890',
       nftAddress,
       erc20Address,
       metadataCacheUri,
-      v3ProviderUri,
-      web3,
-      alice,
-      network,
       encryptedFiles
     )
     assert(
@@ -122,13 +116,10 @@ describe('V3 flow', () => {
   it('Converts 3rd DDO', async () => {
     const ddo3: v4DDO = await getAndConvertDDO(
       did3,
+      '1234567890',
       nftAddress,
       erc20Address,
       metadataCacheUri,
-      v3ProviderUri,
-      web3,
-      alice,
-      network,
       encryptedFiles
     )
     assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')

@@ -42,11 +42,11 @@ describe('Converts V3 DDO to V4 DDO', () => {
   it('Converts 1st DDO', async () => {
     const ddo1: v4DDO = await getAndConvertDDO(
       did1,
+      '1234567890',
       nftAddress,
       erc20Address,
       metadataCacheUri,
-      web3,
-      network
+      'XNOIDOIJFDIJOFDMKLPLLKDAS'
     )
     assert(
       ddo1.metadata.name === '🖼  DataUnion.app - Image & Annotation Vault  📸'
@@ -56,9 +56,11 @@ describe('Converts V3 DDO to V4 DDO', () => {
   it('Converts 2nd DDO', async () => {
     const ddo2: v4DDO = await getAndConvertDDO(
       did2,
+      '1234567890',
       nftAddress,
       erc20Address,
-      metadataCacheUri
+      metadataCacheUri,
+      'XNOIDOIJFDIJOFDMKLPLLKDAS'
     )
     assert(
       ddo2.metadata.name ===
@@ -69,9 +71,11 @@ describe('Converts V3 DDO to V4 DDO', () => {
   it('Converts 3rd DDO', async () => {
     const ddo3: v4DDO = await getAndConvertDDO(
       did3,
+      '1234567890',
       nftAddress,
       erc20Address,
-      metadataCacheUri
+      metadataCacheUri,
+      'XNOIDOIJFDIJOFDMKLPLLKDAS'
     )
     assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')
     assert(ddo3.metadata.type === 'algorithm')
