@@ -10,7 +10,6 @@ const did3 = 'did:op:50C48d3eE0Ed47479d3e2599FAe0076965cBD39c'
 const nftAddress = ''
 const erc20Address = ''
 const metadataCacheUri = 'https://aquarius.oceanprotocol.com'
-const providerUri = 'http://localhost:8030'
 
 describe('Imports V3 DDO', () => {
   it('Imports 1st DDO', async () => {

@@ -14,6 +14,7 @@ import FixedRate from './../../src/artifacts/FixedRateExchange.json'
 import OPFCommunityFeeCollector from './../../src/artifacts/OPFCommunityFeeCollector.json'
 import PoolTemplate from './../../src/artifacts/BPool.json'
 import { Account } from '../../src/v3'
+import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 
 const web3 = new Web3('http://127.0.0.1:8545')
 const providerUrl = 'https://v4.provider.rinkeby.oceanprotocol.com/'
@@ -97,7 +98,6 @@ describe('Migration test', () => {
     } catch (error) {
       console.log('Get Accounts error', error)
     }
-    console.log('v3DtOwner', v3DtOwner)
     expect(v3DtOwner != undefined)
     expect(user1 != undefined)
     expect(user2 != undefined)
@@ -122,6 +122,15 @@ describe('Migration test', () => {
     } catch (error) {
       console.log('Deploy Contracts error', error)
     }
+    expect(v3dt1Address != undefined)
+    expect(v3dt2Address != undefined)
+    expect(v3pool1Address != undefined)
+    expect(v3pool2Address != undefined)
+    expect(migrationAddress != undefined)
+    expect(oceanAddress != undefined)
+    expect(stakingAddress != undefined)
+    expect(factory721Address != undefined)
+    expect(fixedRateAddress != undefined)
   })
 
   it('should publish Fixed Rate Asset', async () => {
@@ -162,6 +171,11 @@ describe('Migration test', () => {
   //     nftAddress,
   //     erc20Address,
   //     metadataCacheUri,
+  //     providerUrl,
+  //     web3,
+  //     v3DtOwner,
+  //     network,
+  //     encr
   //   )
   //   const provider = await ProviderInstance
   //   const encryptedDdo = await provider.encrypt(ddo, providerUrl)

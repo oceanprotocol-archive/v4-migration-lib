@@ -6,14 +6,10 @@ import { Migration } from '../migration/FixedRateExchangeMigration'
 import Web3 from 'web3'
 
 export async function convertDDO(
-  did: string,
+  v4Did: string,
   v3DDO: v3DDO,
   nftAddress: string | '',
   erc20Address: string | '',
-  providerUrl: string,
-  web3: Web3,
-  account: Account,
-  network: string | number,
   encryptedFiles
 ): Promise<v4DDO> {
   const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
@@ -43,7 +39,7 @@ export async function convertDDO(
   }
 
   const newService: Service = {
-    id: did,
+    id: v4Did,
     type: v3DDO.service[1].type,
     files: encryptedFiles || '',
     datatokenAddress: erc20Address,
@@ -56,7 +52,7 @@ export async function convertDDO(
 
   const v4DDO: v4DDO = {
     '@context': ['https://w3id.org/did/v1'],
-    id: did,
+    id: v4Did,
     version: '4.0.0',
     chainId: v3DDO.chainId,
     nftAddress: nftAddress,
@@ -68,27 +64,20 @@ export async function convertDDO(
 }
 
 export async function getAndConvertDDO(
-  did: string,
+  v3Did: string,
+  v4Did: string,
   nftAddress: string,
   erc20Address: string,
   metadataCacheUri: string,
-  providerUrl: string,
-  web3: Web3,
-  account: Account,
-  network: string | number,
   encryptedFiles
 ): Promise<v4DDO> {
-  const v3DDO: v3DDO = await getDDO(did, metadataCacheUri)
+  const v3DDO: v3DDO = await getDDO(v3Did, metadataCacheUri)
 
   const v4DDO: v4DDO = await convertDDO(
-    did,
+    v4Did,
     v3DDO,
     nftAddress,
     erc20Address,
-    providerUrl,
-    web3,
-    account,
-    network,
     encryptedFiles
   )
 
