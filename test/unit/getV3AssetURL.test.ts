@@ -23,7 +23,7 @@ const network = 'development'
 const metadataCacheUri = 'https://aquarius.oceanprotocol.com'
 const did1 = 'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38'
 const did2 = 'did:op:a2B8b3aC4207CFCCbDe4Ac7fa40214fd00A2BA71'
-const did3 = 'did:op:50C48d3eE0Ed47479d3e2599FAe0076965cBD39c'
+const did3 = 'did:op:F3D3CB5707b1fe2c8Ad9cD5bC7f01285334b4880'
 const nftAddress = ''
 const erc20Address = ''
 const encryptedFiles =
@@ -121,8 +121,11 @@ describe('V3 flow', () => {
       metadataCacheUri,
       encryptedFiles
     )
-    assert(ddo3.metadata.name === 'Posthuman: DistilBERT QA inference Algo v2')
-    assert(ddo3.metadata.type === 'algorithm')
+    assert(
+      ddo3.metadata.name ===
+        "UK Traffic 2'177'207 Accidents and Vehicles from 2005 to 2017"
+    )
+    assert(ddo3.metadata.type === 'dataset')
   })
 
   it('Generates metadata', async () => {
