@@ -2,7 +2,7 @@ import { Account, DDO as v3DDO } from '../v3'
 import { DDO as v4DDO } from '../@types/DDO/DDO'
 import { getDDO } from './importDDO'
 import { Metadata, Service, ServiceComputeOptions } from '../@types'
-import { Migration } from '../migration/FixedRateExchangeMigration'
+import { Migration } from '../migration/Migration'
 import Web3 from 'web3'
 
 export async function convertDDO(
@@ -31,7 +31,7 @@ export async function convertDDO(
     tags: v3DDO.service[0].attributes.additionalInformation.tags,
     author: v3DDO.service[0].attributes.main.author,
     license: v3DDO.service[0].attributes.main.license,
-    links: v3DDO.service[0].attributes.additionalInformation.links,
+    links: v3DDO.service[0].attributes.additionalInformation.links.url,
     additionalInformation: {
       termsAndConditions:
         v3DDO.service[0].attributes.additionalInformation.termsAndConditions

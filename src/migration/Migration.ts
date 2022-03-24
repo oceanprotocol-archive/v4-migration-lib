@@ -10,10 +10,11 @@ import { getDDO } from '../DDO/importDDO'
 import ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
 import { SHA256 } from 'crypto-js'
-import { Ocean as V3Ocean } from '../../src/v3/ocean/Ocean'
-import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
+import { Ocean as V3Ocean } from '../v3/ocean/Ocean'
+import { ConfigHelper } from '../v3/utils/ConfigHelper'
 import { Account } from '../v3'
-import { MetadataAndTokenURI, DDO as v4DDO } from '../@types'
+import axios, { AxiosResponse } from 'axios'
+import { DDO as v4DDO } from '../@types'
 
 export interface MetadataProof {
   validatorAddress?: string
@@ -41,7 +42,7 @@ export class Migration {
   }
 
   public async generateDidv4(erc721Address: string): Promise<string> {
-    const chainId = await this.web3.eth.getChainId()
+    const chainId = 1 // await this.web3.eth.getChainId()
     const checksum = SHA256(erc721Address + chainId.toString(10))
     return `did:op:${checksum.toString()}`
   }
@@ -53,6 +54,34 @@ export class Migration {
     }
     const hexMessage = '0x' + hex
     return hexMessage as string
+  }
+
+  public async validateAssetAquariusV4(
+    asset: v4DDO,
+    v4MetadataCacheUri?: string
+  ): Promise<{ validation: MetadataProof; response: any }> {
+    const metadataCacheUri =
+      v4MetadataCacheUri || 'https://v4.aquarius.oceanprotocol.com'
+    const data = JSON.stringify(asset)
+    const response: AxiosResponse<any> = await axios.post(
+      `${metadataCacheUri}/api/aquarius/assets/ddo/validate`,
+      data,
+      { headers: { 'Content-Type': 'application/octet-stream' } }
+    )
+    if (!response || response.status !== 200 || !response.data)
+      return { response: null, validation: {} }
+
+    const { publicKey: validatorAddress, r, s, v } = response.data
+
+    return {
+      response: response.data,
+      validation: {
+        validatorAddress,
+        r: r[0],
+        s: s[0],
+        v: v
+      }
+    }
   }
 
   public async getAssetURL(
@@ -517,7 +546,8 @@ export class Migration {
     dtSymbol: string,
     network: string | number,
     marketURL: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    v4MetadataCacheUri?: string
   ) {
     let txReceipt
     const v3DDO = await getDDO(v3Did, metadataCacheUri)
@@ -569,6 +599,15 @@ export class Migration {
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
+    const { validation, response } = await this.validateAssetAquariusV4(
+      ddo,
+      v4MetadataCacheUri
+    )
+    const isValid = response.hash === dataHash // Should be true
+    if (isValid === false) {
+      console.log('Asset is not valid')
+      return new Error('Invalid DDO hash')
+    }
 
     let txReceipt2
     try {
@@ -581,7 +620,8 @@ export class Migration {
         flags,
         encryptedDdo,
         dataHash,
-        signal
+        signal,
+        [validation]
       )
     } catch (e) {
       console.log('Error', e)
@@ -609,7 +649,8 @@ export class Migration {
     dtSymbol: string,
     network: string | number,
     dispenserData: DispenserData,
-    signal?: AbortSignal
+    signal?: AbortSignal,
+    v4MetadataCacheUri?: string
   ) {
     let txReceipt
     const v3DDO = await getDDO(v3Did, metadataCacheUri)
@@ -657,6 +698,15 @@ export class Migration {
     const provider = await ProviderInstance
     const encryptedDdo = await provider.encrypt(ddo, providerUrl)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
+    const { validation, response } = await this.validateAssetAquariusV4(
+      ddo,
+      v4MetadataCacheUri
+    )
+    const isValid = response.hash === dataHash // Should be true
+    if (isValid === false) {
+      console.log('Asset is not valid')
+      return new Error('Invalid DDO hash')
+    }
 
     let txReceipt2
     try {
@@ -669,7 +719,8 @@ export class Migration {
         flags,
         encryptedDdo,
         dataHash,
-        signal
+        signal,
+        [validation]
       )
     } catch (e) {
       console.log('Error', e)
