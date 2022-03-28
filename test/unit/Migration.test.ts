@@ -167,44 +167,6 @@ describe('Migration test', () => {
     expect(txReceipt.events.NewFixedRate != null)
   })
 
-  // it('should update metadata for Asset', async () => {
-  //   const nftAddress = txReceipt.events.NFTCreated.returnValues.newTokenAddress
-  //   const erc20Address =
-  //     txReceipt.events.TokenCreated.returnValues.newTokenAddress
-
-  //   const ddo = await getAndConvertDDO(
-  //     'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38',
-  //     nftAddress,
-  //     erc20Address,
-  //     metadataCacheUri,
-  //     providerUrl,
-  //     web3,
-  //     v3DtOwner,
-  //     network,
-  //     encr
-  //   )
-  //   const provider = await ProviderInstance
-  //   const encryptedDdo = await provider.encrypt(ddo, providerUrl)
-  //   const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
-
-  //   let txReceipt2
-  //   try {
-  //     txReceipt2 = await migration.updateMetadata(
-  //       v3DtOwner,
-  //       txReceipt,
-  //       1,
-  //       providerUrl,
-  //       '0x123',
-  //       flags,
-  //       encryptedDdo,
-  //       dataHash
-  //     )
-  //   } catch (e) {
-  //     console.log('Error', e)
-  //   }
-  //   expect(txReceipt2.events.MetadataCreated != null)
-  // })
-
   it('should migrate the fixed priced Asset', async () => {
     let response
     let account: Account
@@ -248,7 +210,7 @@ describe('Migration test', () => {
   it('should migrate the free Asset', async () => {
     let response
     let account: Account
-    let dispenserData: DispenserData = {
+    const dispenserData: DispenserData = {
       dispenserAddress: dispenserAddress,
       maxTokens: web3.utils.toWei('1'),
       maxBalance: web3.utils.toWei('1'),
