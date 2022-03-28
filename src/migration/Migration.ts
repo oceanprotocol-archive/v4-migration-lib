@@ -6,7 +6,7 @@ import ERC721Template from '../artifacts/ERC721Template.json'
 import { getFairGasPrice } from '../utils'
 import { getAndConvertDDO } from '../DDO/convertDDO'
 import { getDDO } from '../DDO/importDDO'
-import ProviderInstance from '../provider/Provider'
+import V4ProviderInstance from '../provider/Provider'
 import sha256 from 'crypto-js/sha256'
 import { SHA256 } from 'crypto-js'
 import { Ocean as V3Ocean } from '../v3/ocean/Ocean'
@@ -104,7 +104,7 @@ export class Migration {
   }
 
   public async getEncryptedFiles(
-    providerUrl: string,
+    v4ProviderUrl: string,
     account: Account,
     did: string,
     network: string | number
@@ -118,7 +118,7 @@ export class Migration {
       }
     ]
     try {
-      const response = await ProviderInstance.encrypt(file, providerUrl)
+      const response = await V4ProviderInstance.encrypt(file, v4ProviderUrl)
       return response
     } catch (error) {
       console.error('Error parsing json: ' + error.message)
@@ -142,7 +142,7 @@ export class Migration {
     templateIndex: number,
     dtName: string,
     dtSymbol: string
-  ): Promise<any> {
+  ): Promise<number> {
     const ERC721FactoryContract = new this.web3.eth.Contract(
       ERC721Factory.abi as AbiItem[],
       ERC721FactoryAddress
@@ -435,7 +435,7 @@ export class Migration {
     data: string,
     dataHash: string,
     metadataProofs?: MetadataProof[]
-  ): Promise<any> {
+  ): Promise<number> {
     const gasLimitDefault = this.GASLIMIT_DEFAULT
     let estGas
     const event = txReceipt.events.NFTCreated
@@ -475,7 +475,6 @@ export class Migration {
     flags: string,
     data: string,
     dataHash: string,
-    signal?: AbortSignal,
     metadataProofs?: MetadataProof[]
   ) {
     const event = txReceipt.events.NFTCreated
@@ -538,18 +537,16 @@ export class Migration {
     baseTokenAddress: string,
     metaDataState: number,
     metaDataDecryptorAddress: string,
-    providerUrl: string,
-    metadataCacheUri: string,
+    v4ProviderUrl: string,
+    v3MetadataCacheUri: string,
     templateIndex: number,
     dtName: string,
     dtSymbol: string,
     network: string | number,
-    marketURL: string,
-    signal?: AbortSignal,
     v4MetadataCacheUri?: string
   ) {
     let txReceipt: TransactionReceipt
-    const v3DDO = await getDDO(v3Did, metadataCacheUri)
+    const v3DDO = await getDDO(v3Did, v3MetadataCacheUri)
     const description =
       v3DDO.service[0].attributes.additionalInformation.description
 
@@ -580,7 +577,7 @@ export class Migration {
       txReceipt.events.TokenCreated.returnValues.newTokenAddress
 
     const encryptedFiles = await this.getEncryptedFiles(
-      providerUrl,
+      v4ProviderUrl,
       ownerAccount,
       v3Did,
       network
@@ -592,11 +589,11 @@ export class Migration {
       v4Did,
       nftAddress,
       erc20Address,
-      metadataCacheUri,
+      v3MetadataCacheUri,
       encryptedFiles
     )
-    const provider = await ProviderInstance
-    const encryptedDdo = await provider.encrypt(ddo, providerUrl)
+    const v4Provider = await V4ProviderInstance
+    const encryptedDdo = await v4Provider.encrypt(ddo, v4ProviderUrl)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
     const { validation, response } = await this.validateAssetAquariusV4(
       ddo,
@@ -614,12 +611,11 @@ export class Migration {
         ownerAddress,
         txReceipt,
         metaDataState,
-        providerUrl,
+        v4ProviderUrl,
         metaDataDecryptorAddress,
         flags,
         encryptedDdo,
         dataHash,
-        signal,
         [validation]
       )
     } catch (e) {
@@ -641,18 +637,17 @@ export class Migration {
     publishingMarketTokenAddress: string,
     metaDataState: number,
     metaDataDecryptorAddress: string,
-    providerUrl: string,
-    metadataCacheUri: string,
+    v4ProviderUrl: string,
+    v3MetadataCacheUri: string,
     templateIndex: number,
     dtName: string,
     dtSymbol: string,
     network: string | number,
     dispenserData: DispenserData,
-    signal?: AbortSignal,
     v4MetadataCacheUri?: string
   ) {
     let txReceipt: TransactionReceipt
-    const v3DDO = await getDDO(v3Did, metadataCacheUri)
+    const v3DDO = await getDDO(v3Did, v3MetadataCacheUri)
     const description =
       v3DDO.service[0].attributes.additionalInformation.description
 
@@ -679,7 +674,7 @@ export class Migration {
       txReceipt.events.TokenCreated.returnValues.newTokenAddress
 
     const encryptedFiles = await this.getEncryptedFiles(
-      providerUrl,
+      v4ProviderUrl,
       ownerAccount,
       v3Did,
       network
@@ -691,11 +686,11 @@ export class Migration {
       v4Did,
       nftAddress,
       erc20Address,
-      metadataCacheUri,
+      v3MetadataCacheUri,
       encryptedFiles
     )
-    const provider = await ProviderInstance
-    const encryptedDdo = await provider.encrypt(ddo, providerUrl)
+    const v4Provider = await V4ProviderInstance
+    const encryptedDdo = await v4Provider.encrypt(ddo, v4ProviderUrl)
     const dataHash = '0x' + sha256(JSON.stringify(ddo)).toString()
     const { validation, response } = await this.validateAssetAquariusV4(
       ddo,
@@ -713,12 +708,11 @@ export class Migration {
         ownerAddress,
         txReceipt,
         metaDataState,
-        providerUrl,
+        v4ProviderUrl,
         metaDataDecryptorAddress,
         flags,
         encryptedDdo,
         dataHash,
-        signal,
         [validation]
       )
     } catch (e) {

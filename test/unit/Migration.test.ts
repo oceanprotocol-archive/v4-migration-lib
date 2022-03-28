@@ -190,8 +190,7 @@ describe('Migration test', () => {
         templateIndex,
         dtName,
         dtSymbol,
-        network,
-        marketURL
+        network
       )
     } catch (e) {
       console.log('Error', e)
