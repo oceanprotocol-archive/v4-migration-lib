@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import { Contract } from 'web3-eth-contract'
 import { TransactionReceipt } from 'web3-eth'
 import { AbiItem } from 'web3-utils'
 import ERC721Factory from '../artifacts/ERC721Factory.json'
@@ -239,7 +238,7 @@ export class Migration {
       dtName,
       dtSymbol
     )
-    let tx
+    let tx: TransactionReceipt
     const encodedMetadata = Buffer.from(
       JSON.stringify({
         name: nftName,
@@ -383,7 +382,7 @@ export class Migration {
       dtSymbol,
       dispenserData
     )
-    let tx
+    let tx: TransactionReceipt
     const encodedMetadata = Buffer.from(
       JSON.stringify({
         name: nftName,
@@ -428,7 +427,7 @@ export class Migration {
 
   public async estGasUpdateMetadata(
     ownerAddress: string,
-    txReceipt: any,
+    txReceipt: TransactionReceipt,
     metaDataState: number,
     metaDataDecryptorUrl: string,
     metaDataDecryptorAddress: string,
@@ -469,7 +468,7 @@ export class Migration {
 
   public async updateMetadata(
     ownerAddress: string,
-    txReceipt: any,
+    txReceipt: TransactionReceipt,
     metaDataState: number,
     metaDataDecryptorUrl: string,
     metaDataDecryptorAddress: string,
@@ -499,7 +498,7 @@ export class Migration {
       metadataProofs
     )
 
-    let tx
+    let tx: TransactionReceipt
     try {
       tx = await tokenERC721.methods
         .setMetaData(
@@ -549,7 +548,7 @@ export class Migration {
     signal?: AbortSignal,
     v4MetadataCacheUri?: string
   ) {
-    let txReceipt
+    let txReceipt: TransactionReceipt
     const v3DDO = await getDDO(v3Did, metadataCacheUri)
     const description =
       v3DDO.service[0].attributes.additionalInformation.description
@@ -609,7 +608,7 @@ export class Migration {
       return new Error('Invalid DDO hash')
     }
 
-    let txReceipt2
+    let txReceipt2: TransactionReceipt
     try {
       txReceipt2 = await this.updateMetadata(
         ownerAddress,
@@ -652,7 +651,7 @@ export class Migration {
     signal?: AbortSignal,
     v4MetadataCacheUri?: string
   ) {
-    let txReceipt
+    let txReceipt: TransactionReceipt
     const v3DDO = await getDDO(v3Did, metadataCacheUri)
     const description =
       v3DDO.service[0].attributes.additionalInformation.description
@@ -708,7 +707,7 @@ export class Migration {
       return new Error('Invalid DDO hash')
     }
 
-    let txReceipt2
+    let txReceipt2: TransactionReceipt
     try {
       txReceipt2 = await this.updateMetadata(
         ownerAddress,
