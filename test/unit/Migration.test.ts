@@ -4,7 +4,6 @@ import { TestContractHandler } from '../TestContractHandler'
 import Web3 from 'web3'
 import { Migration, DispenserData } from '../../src/migration/Migration'
 import Dispenser from '../../src/artifacts/Dispenser.json'
-import IERC20 from '../../src/artifacts/IERC20.json'
 import ERC721Factory from '../../src/artifacts/ERC721Factory.json'
 import ERC721Template from '../../src/artifacts/ERC721Template.json'
 import SideStaking from '../../src/artifacts/SideStaking.json'
@@ -14,7 +13,6 @@ import FixedRate from '../../src/artifacts/FixedRateExchange.json'
 import OPFCommunityFeeCollector from '../../src/artifacts/OPFCommunityFeeCollector.json'
 import PoolTemplate from '../../src/artifacts/BPool.json'
 import { Account } from '../../src/v3'
-import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 import { ZERO_ADDRESS } from '../../src/utils/Constants'
 
 const web3 = new Web3('http://127.0.0.1:8545')
@@ -37,7 +35,6 @@ const templateIndex = 1
 const dtName = 'Test Datatoken'
 const dtSymbol = 'TEST-DT'
 const network = 'v4-testing'
-const dataURL = 'http://oceanprotocol.com/test'
 const description = 'Example description with lots of detail...'
 
 describe('Migration test', () => {

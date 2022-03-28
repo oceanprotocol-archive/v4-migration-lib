@@ -89,8 +89,7 @@ export class TestContractHandler {
     sideStakingBytecode?: string,
     fixedRateBytecode?: string,
     dispenserBytecode?: string,
-    opfBytecode?: string,
-    migrationBytecode?: string
+    opfBytecode?: string
   ) {
     this.web3 = web3
     this.ERC721Template = new this.web3.eth.Contract(ERC721TemplateABI)
@@ -670,9 +669,5 @@ export class TestContractHandler {
     await RouterContract.methods
       .addSSContract(this.sideStakingAddress)
       .send({ from: owner })
-
-    // await RouterContract.methods
-    //   .changeRouterOwner(this.opfCollectorAddress)
-    //   .send({ from: owner })
   }
 }

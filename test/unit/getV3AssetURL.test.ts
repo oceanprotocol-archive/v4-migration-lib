@@ -1,6 +1,6 @@
 import datatokensTemplate from '@oceanprotocol/contracts/artifacts/DataTokenTemplate.json'
 import factory from '@oceanprotocol/contracts/artifacts/DTFactory.json'
-import { assert, use } from 'chai'
+import { assert } from 'chai'
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils/types'
 import { DataTokens } from '../../src/v3/datatokens/Datatokens'
@@ -10,15 +10,12 @@ import { ConfigHelper } from '../../src/v3/utils/ConfigHelper'
 import { TestContractHandler } from '../V3TestContractHandler'
 import { LoggerInstance } from '../../src/v3/utils'
 import { Migration } from '../../src/migration/Migration'
-import { DDO as v3DDO } from '../../src/v3'
 import { DDO as v4DDO } from '../../src/@types/DDO/DDO'
-import { getDDO } from '../../src/DDO/importDDO'
 import { getAndConvertDDO } from '../../src/DDO/convertDDO'
 
 const web3 = new Web3('http://127.0.0.1:8545')
 const url = 'https://people.sc.fsu.edu/~jburkardt/data/csv/homes.csv'
 const v4ProviderUrl = 'https://v4.provider.ropsten.oceanprotocol.com'
-const v3ProviderUri = 'http://localhost:8030'
 const network = 'development'
 const metadataCacheUri = 'https://aquarius.oceanprotocol.com'
 const did1 = 'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38'
@@ -35,7 +32,6 @@ describe('V3 flow', () => {
     ddo,
     did: string,
     asset,
-    assetInvalidNoName,
     contracts: TestContractHandler,
     datatoken: DataTokens,
     tokenAddress: string,
