@@ -2,7 +2,6 @@ import Web3 from 'web3'
 import { Contract } from 'web3-eth-contract'
 import { AbiItem } from 'web3-utils/types'
 import MockERC20 from './../src/artifacts/MockERC20.json'
-import V4Migration from './../src/artifacts/V4Migration.json'
 import V3BFactory from './../src/artifacts/V3BFactory.json'
 import V3DTFactory from './../src/artifacts/DTFactory.json'
 import V3BPoolTemplate from './../src/artifacts/V3BPool.json'
@@ -90,8 +89,7 @@ export class TestContractHandler {
     sideStakingBytecode?: string,
     fixedRateBytecode?: string,
     dispenserBytecode?: string,
-    opfBytecode?: string,
-    migrationBytecode?: string
+    opfBytecode?: string
   ) {
     this.web3 = web3
     this.ERC721Template = new this.web3.eth.Contract(ERC721TemplateABI)
@@ -104,7 +102,6 @@ export class TestContractHandler {
     this.Dispenser = new this.web3.eth.Contract(DispenserABI)
     this.MockERC20 = new this.web3.eth.Contract(MockERC20.abi as AbiItem[])
     this.OPFCollector = new this.web3.eth.Contract(OPFABI)
-    this.Migration = new this.web3.eth.Contract(V4Migration.abi as AbiItem[])
 
     this.V3BFactory = new this.web3.eth.Contract(V3BFactory.abi as AbiItem[])
     this.V3DTFactory = new this.web3.eth.Contract(V3DTFactory.abi as AbiItem[])
@@ -125,7 +122,6 @@ export class TestContractHandler {
     this.DispenserBytecode = dispenserBytecode
     this.MockERC20Bytecode = MockERC20.bytecode
     this.OPFBytecode = opfBytecode
-    this.MigrationBytecode = V4Migration.bytecode
 
     this.V3BFactoryBytecode = V3BFactory.bytecode
     this.V3DTFactoryBytecode = V3DTFactory.bytecode
@@ -134,7 +130,11 @@ export class TestContractHandler {
   }
 
   public async getAccounts(): Promise<string[]> {
-    this.accounts = await this.web3.eth.getAccounts()
+    try {
+      this.accounts = await this.web3.eth.getAccounts()
+    } catch (error) {
+      console.log('Get Accounts Error:', error)
+    }
     return this.accounts
   }
 
@@ -332,6 +332,7 @@ export class TestContractHandler {
 
     // DEPLOY OCEAN MOCK
     // get est gascost
+
     estGas = await this.MockERC20.deploy({
       data: this.MockERC20Bytecode,
       arguments: ['OCEAN', 'OCEAN', 18]
@@ -431,6 +432,28 @@ export class TestContractHandler {
         return contract.options.address
       })
 
+    // DEPLOY Dispenser
+    estGas = await this.Dispenser.deploy({
+      data: this.DispenserBytecode,
+      arguments: [this.routerAddress]
+    }).estimateGas(function (err, estGas) {
+      if (err) console.log('DeployContracts: ' + err)
+      return estGas
+    })
+    // deploy the contract and get it's address
+    this.dispenserAddress = await this.Dispenser.deploy({
+      data: this.DispenserBytecode,
+      arguments: [this.routerAddress]
+    })
+      .send({
+        from: owner,
+        gas: estGas + 1,
+        gasPrice: '3000000000'
+      })
+      .then(function (contract) {
+        return contract.options.address
+      })
+
     // DEPLOY ERC721 FACTORY
     estGas = await this.ERC721Factory.deploy({
       data: this.ERC721FactoryBytecode,
@@ -509,48 +532,10 @@ export class TestContractHandler {
         return contract.options.address
       })
 
-    // DEPLOY Migration Contract
-    // get est gascost
-    estGas = await this.Migration.deploy({
-      data: this.MigrationBytecode,
-      arguments: [
-        this.factory721Address,
-        this.oceanAddress,
-        this.poolTemplateAddress,
-        daemon
-      ]
-    }).estimateGas(function (err, estGas) {
-      if (err) console.log('DeployContracts: ' + err)
-      return estGas
-    })
-    // deploy the contract and get it's address
-    this.migrationAddress = await this.Migration.deploy({
-      data: this.MigrationBytecode,
-      arguments: [
-        this.factory721Address,
-        this.oceanAddress,
-        this.poolTemplateAddress,
-        daemon
-      ]
-    })
-      .send({
-        from: owner,
-        gas: estGas + 1,
-        gasPrice: '3000000000'
-      })
-      .then(function (contract) {
-        return contract.options.address
-      })
-
     // V3 DT and Pool Creation
     const RouterContract = new this.web3.eth.Contract(
       routerABI,
       this.routerAddress
-    )
-
-    const MigrationContract = new this.web3.eth.Contract(
-      V4Migration.abi as AbiItem[],
-      this.migrationAddress
     )
     const V3DtFactory = new this.web3.eth.Contract(
       V3DTFactory.abi as AbiItem[],
@@ -562,7 +547,6 @@ export class TestContractHandler {
       this.v3BFactoryAddress
     )
     let trxReceipt
-    console.log('aqui1')
     // CREATE V3 datatoken1
     try {
       trxReceipt = await V3DtFactory.methods
@@ -571,8 +555,6 @@ export class TestContractHandler {
     } catch (e) {
       console.log(e.message)
     }
-
-    console.log('aqui2')
 
     this.v3dt1Address =
       trxReceipt.events.TokenCreated.returnValues.newTokenAddress
@@ -665,9 +647,6 @@ export class TestContractHandler {
       )
       .send({ from: owner })
 
-    console.log(await V3Pool1.methods.isFinalized().call())
-    console.log(await V3Pool2.methods.isFinalized().call())
-
     // v3 lpt owner transfer half of his LPTs to user1 and user2 (30 y 20 Lpts respectively)
     await V3Pool1.methods
       .transfer(this.accounts[1], this.web3.utils.toWei('30')) // 30 out of 100
@@ -676,9 +655,6 @@ export class TestContractHandler {
       .transfer(this.accounts[2], this.web3.utils.toWei('20')) // 20 out of 100
       .send({ from: owner })
 
-    console.log(await V3Pool1.methods.balanceOf(this.accounts[1]).call())
-    console.log(await V3Pool1.methods.balanceOf(this.accounts[2]).call())
-
     // V4 set up
     await RouterContract.methods
       .addFactory(this.factory721Address)
@@ -686,16 +662,12 @@ export class TestContractHandler {
     await RouterContract.methods
       .addFixedRateContract(this.fixedRateAddress)
       .send({ from: owner })
+    await RouterContract.methods
+      .addDispenserContract(this.dispenserAddress)
+      .send({ from: owner })
 
     await RouterContract.methods
       .addSSContract(this.sideStakingAddress)
       .send({ from: owner })
-
-    await MigrationContract.methods
-      .addMigrationStaking(this.sideStakingAddress)
-      .send({ from: owner })
-    // await RouterContract.methods
-    //   .changeRouterOwner(this.opfCollectorAddress)
-    //   .send({ from: owner })
   }
 }

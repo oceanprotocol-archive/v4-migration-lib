@@ -121,9 +121,9 @@ export interface Service {
 
   /**
    * Describing how long the service can be used after consumption is initiated.
-   * @type {string}
+   * @type {number}
    */
-  timeout: string
+  timeout: number
 
   /**
    * Service friendly name
@@ -142,4 +142,10 @@ export interface Service {
    * @type {ServiceComputeOptions}
    */
   compute?: ServiceComputeOptions
+
+  /**
+   * Stores service specific additional information, this is customizable by publisher
+   * @type {any}
+   */
+  additionalInformation?: any
 }
