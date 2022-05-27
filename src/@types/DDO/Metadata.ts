@@ -12,6 +12,12 @@ export interface MetadataAlgorithm {
   version?: string
 
   /**
+   * Rawcode
+   * @type {string}
+   */
+  rawcode?: string
+
+  /**
    * Object describing the Docker container image.
    * @type {Object}
    */
@@ -95,11 +101,16 @@ export interface Metadata {
   links?: string[]
 
   /**
-   * Mapping of URL strings for data samples, or links to find out more information.
-   * Links may be to either a URL or another asset.
+   * Array of keywords or tags used to describe this content. Empty by default.
    * @type {string[]}
    */
   tags?: string[]
+
+  /**
+   * Array of categories associated to the asset. Note: recommended to use tags instead of this.
+   * @type {string[]}
+   */
+  categories?: string[]
 
   /**
    * The party holding the legal copyright. Empty by default.
@@ -124,4 +135,17 @@ export interface Metadata {
    * @type {any}
    */
   additionalInformation?: any
+}
+
+export interface MetadataProof {
+  validatorAddress?: string
+  r?: string
+  s?: string
+  v?: number
+}
+export interface ValidateMetadata {
+  valid: Boolean
+  errors?: Object
+  hash?: string
+  proof?: MetadataProof
 }

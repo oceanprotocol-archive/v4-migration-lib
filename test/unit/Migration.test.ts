@@ -2,177 +2,247 @@ import { assert, expect } from 'chai'
 import { AbiItem } from 'web3-utils/types'
 import { TestContractHandler } from '../TestContractHandler'
 import Web3 from 'web3'
-import { Migration } from '../../src/migration/Migration'
-import ERC721Factory from '@oceanprotocol/contracts/artifacts/contracts/ERC721Factory.sol/ERC721Factory.json'
-import ERC721Template from '@oceanprotocol/contracts/artifacts/contracts/templates/ERC721Template.sol/ERC721Template.json'
-import SideStaking from '@oceanprotocol/contracts/artifacts/contracts/pools/ssContracts/SideStaking.sol/SideStaking.json'
-import Router from '@oceanprotocol/contracts/artifacts/contracts/pools/FactoryRouter.sol/FactoryRouter.json'
-import ERC20Template from '@oceanprotocol/contracts/artifacts/contracts/templates/ERC20Template.sol/ERC20Template.json'
-import Dispenser from '@oceanprotocol/contracts/artifacts/contracts/pools/dispenser/Dispenser.sol/Dispenser.json'
-import FixedRate from '@oceanprotocol/contracts/artifacts/contracts/pools/fixedRate/FixedRateExchange.sol/FixedRateExchange.json'
-import OPFCommunityFeeCollector from '@oceanprotocol/contracts/artifacts/contracts/communityFee/OPFCommunityFeeCollector.sol/OPFCommunityFeeCollector.json'
-import PoolTemplate from '@oceanprotocol/contracts/artifacts/contracts/pools/balancer/BPool.sol/BPool.json'
+import { Migration, DispenserData } from '../../src/migration/Migration'
+import Dispenser from '../../src/artifacts/Dispenser.json'
+import ERC721Factory from '../../src/artifacts/ERC721Factory.json'
+import ERC721Template from '../../src/artifacts/ERC721Template.json'
+import SideStaking from '../../src/artifacts/SideStaking.json'
+import Router from '../../src/artifacts/FactoryRouter.json'
+import ERC20Template from '../../src/artifacts/ERC20Template.json'
+import FixedRate from '../../src/artifacts/FixedRateExchange.json'
+import OPFCommunityFeeCollector from '../../src/artifacts/OPFCommunityFeeCollector.json'
+import PoolTemplate from '../../src/artifacts/BPool.json'
+import { Account } from '../../src/v3'
 import { ZERO_ADDRESS } from '../../src/utils/Constants'
+
 const web3 = new Web3('http://127.0.0.1:8545')
+const providerUrl = 'https://v4.provider.rinkeby.oceanprotocol.com/'
+const metadataCacheUri = 'https://aquarius.oceanprotocol.com'
+const marketURL = 'https://market.oceanprotocol.com'
+
+const did = 'did:op:7Bce67697eD2858d0683c631DdE7Af823b7eea38'
+const nftName = 'OCEAN NFT'
+const nftSymbol = 'OCEAN-NFT'
+const cap = 10000
+const marketFee = 1e15
+const rate = web3.utils.toWei('1')
+const publishingMarketFeeAddress = '0x9984b2453eC7D99a73A5B3a46Da81f197B753C8d'
+const publishingMarketTokenAddress =
+  '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
+const baseTokenAddress = '0x967da4048cD07aB37855c090aAF366e4ce1b9F48'
+const flags = '0x02'
+const templateIndex = 1
+const dtName = 'Test Datatoken'
+const dtSymbol = 'TEST-DT'
+const network = 'v4-testing'
+const description = 'Example description with lots of detail...'
 
 describe('Migration test', () => {
-  let v3DtOwner: string
-  let user1: string
-  let user2: string
-  let v3dt1Address: string
-  let v3dt2Address: string
-  let v3pool1Address: string
-  let v3pool2Address: string
-  let migrationAddress: string
-  let contracts: TestContractHandler
-  let migration: Migration
-
-  it('should deploy contracts', async () => {
-    contracts = new TestContractHandler(
-      web3,
-      ERC721Template.abi as AbiItem[],
-      ERC20Template.abi as AbiItem[],
-      PoolTemplate.abi as AbiItem[],
-      ERC721Factory.abi as AbiItem[],
-      Router.abi as AbiItem[],
-      SideStaking.abi as AbiItem[],
-      FixedRate.abi as AbiItem[],
-      Dispenser.abi as AbiItem[],
-      OPFCommunityFeeCollector.abi as AbiItem[],
-
-      ERC721Template.bytecode,
-      ERC20Template.bytecode,
-      PoolTemplate.bytecode,
-      ERC721Factory.bytecode,
-      Router.bytecode,
-      SideStaking.bytecode,
-      FixedRate.bytecode,
-      Dispenser.bytecode,
-      OPFCommunityFeeCollector.bytecode
-    )
-    await contracts.getAccounts()
-    v3DtOwner = contracts.accounts[0]
-    user1 = contracts.accounts[1]
-    user2 = contracts.accounts[2]
-
-    await contracts.deployContracts(v3DtOwner, Router.abi as AbiItem[])
-    //console.log(contracts)
-    v3dt1Address = contracts.v3dt1Address
-    v3dt2Address = contracts.v3dt2Address
-    v3pool1Address = contracts.v3pool1Address
-    v3pool2Address = contracts.v3pool2Address
-    migrationAddress = contracts.migrationAddress
-  })
+  let v3DtOwner: string,
+    user1: string,
+    user2: string,
+    daemon: string,
+    v3dt1Address: string,
+    v3dt2Address: string,
+    v3pool1Address: string,
+    v3pool2Address: string,
+    migrationAddress: string,
+    contracts: TestContractHandler,
+    migration: Migration,
+    oceanAddress: string,
+    stakingAddress: string,
+    factory721Address: string,
+    fixedRateAddress: string,
+    txReceipt: any,
+    dispenserAddress: string
 
   it('should initiate Migration instance', async () => {
     migration = new Migration(web3)
     assert(migration != undefined, 'Failed to initialize Migration class')
   })
 
-  it('#getNftFactory - should return Nft Factory address', async () => {
-    expect(await migration.getNftFactory(migrationAddress)).to.equal(
-      contracts.factory721Address
-    )
+  it('should deploy contracts', async () => {
+    try {
+      contracts = new TestContractHandler(
+        web3,
+        ERC721Template.abi as AbiItem[],
+        ERC20Template.abi as AbiItem[],
+        PoolTemplate.abi as AbiItem[],
+        ERC721Factory.abi as AbiItem[],
+        Router.abi as AbiItem[],
+        SideStaking.abi as AbiItem[],
+        FixedRate.abi as AbiItem[],
+        Dispenser.abi as AbiItem[],
+        OPFCommunityFeeCollector.abi as AbiItem[],
+
+        ERC721Template.bytecode,
+        ERC20Template.bytecode,
+        PoolTemplate.bytecode,
+        ERC721Factory.bytecode,
+        Router.bytecode,
+        SideStaking.bytecode,
+        FixedRate.bytecode,
+        Dispenser.bytecode,
+        OPFCommunityFeeCollector.bytecode
+      )
+    } catch (error) {
+      console.log('contracts error', error)
+    }
+
+    try {
+      await contracts.getAccounts()
+      v3DtOwner = contracts.accounts[0]
+      user1 = contracts.accounts[1]
+      user2 = contracts.accounts[2]
+      daemon = contracts.accounts[9]
+    } catch (error) {
+      console.log('Get Accounts error', error)
+    }
+    expect(v3DtOwner != undefined)
+    expect(user1 != undefined)
+    expect(user2 != undefined)
+    expect(daemon != undefined)
+
+    try {
+      await contracts.deployContracts(
+        v3DtOwner,
+        daemon,
+        Router.abi as AbiItem[]
+      )
+      //console.log(contracts)
+      v3dt1Address = contracts.v3dt1Address
+      v3dt2Address = contracts.v3dt2Address
+      v3pool1Address = contracts.v3pool1Address
+      v3pool2Address = contracts.v3pool2Address
+      migrationAddress = contracts.migrationAddress
+      oceanAddress = contracts.oceanAddress
+      stakingAddress = contracts.sideStakingAddress
+      factory721Address = contracts.factory721Address
+      fixedRateAddress = contracts.fixedRateAddress
+      dispenserAddress = contracts.dispenserAddress
+    } catch (error) {
+      console.log('Deploy Contracts error', error)
+    }
+    expect(v3dt1Address != undefined)
+    expect(v3dt2Address != undefined)
+    expect(v3pool1Address != undefined)
+    expect(v3pool2Address != undefined)
+    expect(migrationAddress != undefined)
+    expect(oceanAddress != undefined)
+    expect(stakingAddress != undefined)
+    expect(factory721Address != undefined)
+    expect(fixedRateAddress != undefined)
+    expect(dispenserAddress != dispenserAddress)
   })
-  it('#getOcean - should return Ocean address', async () => {
-    expect(await migration.getOcean(migrationAddress)).to.equal(
-      contracts.oceanAddress
-    )
-  })
-  it('#getPoolTemplate - should return Pool template address', async () => {
-    expect(await migration.getPoolTemplate(migrationAddress)).to.equal(
-      contracts.poolTemplateAddress
-    )
-  })
-  it('#startMigration - should succed to call startMigration', async () => {
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
-    ).to.equal('0')
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
-        .poolV3Address
-    ).to.equal(ZERO_ADDRESS)
 
-    await migration.startMigration(
-      v3DtOwner,
-      migrationAddress,
-      v3dt1Address,
-      v3pool1Address,
-      'didV3',
-      'tokenURI',
-      ['NFTname', 'NFTsymbol'],
-      ['ERC20name', 'ERC20symbol']
-    )
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address)).status
-    ).to.equal('1')
-    expect(
-      (await migration.getPoolStatus(migrationAddress, v3pool1Address))
-        .poolV3Address
-    ).to.equal(v3pool1Address)
+  it('should publish Fixed Rate Asset', async () => {
+    try {
+      txReceipt = await migration.publishFixedRateAsset(
+        did,
+        description,
+        factory721Address,
+        nftName,
+        nftSymbol,
+        v3DtOwner,
+        cap,
+        rate,
+        marketFee,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        fixedRateAddress,
+        baseTokenAddress,
+        templateIndex,
+        dtName,
+        dtSymbol
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
+
+    expect(txReceipt.events.NFTCreated != null)
+    expect(txReceipt.events.TokenCreated != null)
+    expect(txReceipt.events.NewFixedRate != null)
   })
 
-  it('#addShares - v3DtOwner adds his LPTs', async () => {
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('0'))
+  it('should migrate the fixed priced Asset', async () => {
+    let response
+    let account: Account
+    try {
+      response = await migration.migrateFixedRateAsset(
+        did,
+        factory721Address,
+        nftName,
+        nftSymbol,
+        v3DtOwner,
+        account,
+        cap,
+        rate,
+        flags,
+        marketFee,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        fixedRateAddress,
+        baseTokenAddress,
+        1,
+        '0x123',
+        providerUrl,
+        metadataCacheUri,
+        templateIndex,
+        dtName,
+        dtSymbol,
+        network
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
 
-    await migration.approve(
-      v3DtOwner,
-      v3pool1Address,
-      migrationAddress,
-      web3.utils.toWei('50')
-    )
+    expect(response.txReceipt.events.NFTCreated != null)
+    expect(response.txReceipt.events.TokenCreated != null)
+    expect(response.txReceipt.events.NewFixedRate != null)
 
-    await migration.addShares(
-      v3DtOwner,
-      migrationAddress,
-      v3pool1Address,
-      web3.utils.toWei('50')
-    )
-
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('50'))
+    expect(response.txReceipt2.events.MetadataCreated != null)
   })
-  it('#removeShares - v3DtOwner remove his LPTs before deadline', async () => {
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('50'))
 
-    await migration.removeShares(
-      v3DtOwner,
-      migrationAddress,
-      v3pool1Address,
-      web3.utils.toWei('50')
-    )
+  it('should migrate the free Asset', async () => {
+    let response
+    let account: Account
+    const dispenserData: DispenserData = {
+      dispenserAddress: dispenserAddress,
+      maxTokens: web3.utils.toWei('1'),
+      maxBalance: web3.utils.toWei('1'),
+      withMint: true,
+      allowedSwapper: ZERO_ADDRESS
+    }
+    try {
+      response = await migration.migrateFreeAsset(
+        did,
+        factory721Address,
+        nftName,
+        nftSymbol,
+        v3DtOwner,
+        account,
+        cap,
+        flags,
+        publishingMarketFeeAddress,
+        publishingMarketTokenAddress,
+        1,
+        '0x123',
+        providerUrl,
+        metadataCacheUri,
+        templateIndex,
+        dtName,
+        dtSymbol,
+        network,
+        dispenserData
+      )
+    } catch (e) {
+      console.log('Error', e)
+    }
 
-    expect(
-      (
-        await migration.getShareAllocation(
-          migrationAddress,
-          v3pool1Address,
-          v3DtOwner
-        )
-      ).userV3Shares
-    ).to.equal(web3.utils.toWei('0'))
+    expect(response.txReceipt.events.NFTCreated != null)
+    expect(response.txReceipt.events.TokenCreated != null)
+    expect(response.txReceipt.events.NewFixedRate != null)
+
+    expect(response.txReceipt2.events.MetadataCreated != null)
   })
 })

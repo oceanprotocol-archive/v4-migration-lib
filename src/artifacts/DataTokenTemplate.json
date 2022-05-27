@@ -689,20 +689,14 @@
   "ast": {
     "absolutePath": "project:/contracts/templates/DataTokenTemplate.sol",
     "exportedSymbols": {
-      "DataTokenTemplate": [
-        7078
-      ]
+      "DataTokenTemplate": [7078]
     },
     "id": 7079,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 6554,
-        "literals": [
-          "solidity",
-          "0.5",
-          ".7"
-        ],
+        "literals": ["solidity", "0.5", ".7"],
         "nodeType": "PragmaDirective",
         "src": "0:22:18"
       },
@@ -767,23 +761,12 @@
             "src": "534:5:18"
           }
         ],
-        "contractDependencies": [
-          26,
-          736,
-          805,
-          6464
-        ],
+        "contractDependencies": [26, 736, 805, 6464],
         "contractKind": "contract",
         "documentation": "@title DataTokenTemplate\n \n@dev DataTokenTemplate is an ERC20 compliant token template\n     Used by the factory contract as a bytecode reference to \n     deploy new DataTokens.",
         "fullyImplemented": true,
         "id": 7078,
-        "linearizedBaseContracts": [
-          7078,
-          736,
-          805,
-          26,
-          6464
-        ],
+        "linearizedBaseContracts": [7078, 736, 805, 26, 6464],
         "name": "DataTokenTemplate",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1915,10 +1898,7 @@
                       "id": 6642,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "1796:7:18",
                       "typeDescriptions": {
@@ -2068,10 +2048,7 @@
                       "id": 6652,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "1968:7:18",
                       "typeDescriptions": {
@@ -2958,10 +2935,7 @@
                       "id": 6733,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "4644:7:18",
                       "typeDescriptions": {
@@ -3112,10 +3086,7 @@
                       "id": 6742,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "4778:7:18",
                       "typeDescriptions": {
@@ -3266,10 +3237,7 @@
                       "id": 6751,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "4905:7:18",
                       "typeDescriptions": {
@@ -3382,10 +3350,7 @@
                       "id": 6760,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "5053:7:18",
                       "typeDescriptions": {
@@ -4127,10 +4092,7 @@
                       "id": 6807,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "5816:7:18",
                       "typeDescriptions": {
@@ -4335,9 +4297,7 @@
               "src": "6532:795:18",
               "statements": [
                 {
-                  "assignments": [
-                    6836
-                  ],
+                  "assignments": [6836],
                   "declarations": [
                     {
                       "constant": false,
@@ -4389,9 +4349,7 @@
                   "src": "6542:21:18"
                 },
                 {
-                  "assignments": [
-                    6840
-                  ],
+                  "assignments": [6840],
                   "declarations": [
                     {
                       "constant": false,
@@ -4833,9 +4791,7 @@
                   }
                 },
                 {
-                  "assignments": [
-                    6871
-                  ],
+                  "assignments": [6871],
                   "declarations": [
                     {
                       "constant": false,
@@ -5542,10 +5498,7 @@
                         "id": 6912,
                         "name": "require",
                         "nodeType": "Identifier",
-                        "overloadedDeclarations": [
-                          7124,
-                          7125
-                        ],
+                        "overloadedDeclarations": [7124, 7125],
                         "referencedDeclaration": 7125,
                         "src": "8023:7:18",
                         "typeDescriptions": {
@@ -6194,10 +6147,7 @@
                       "id": 6954,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "9028:7:18",
                       "typeDescriptions": {
@@ -7573,19 +7523,13 @@
     "attributes": {
       "absolutePath": "project:/contracts/templates/DataTokenTemplate.sol",
       "exportedSymbols": {
-        "DataTokenTemplate": [
-          7078
-        ]
+        "DataTokenTemplate": [7078]
       }
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            "0.5",
-            ".7"
-          ]
+          "literals": ["solidity", "0.5", ".7"]
         },
         "id": 6554,
         "name": "PragmaDirective",
@@ -7597,9 +7541,7 @@
           "absolutePath": "project:/contracts/interfaces/IERC20Template.sol",
           "file": "../interfaces/IERC20Template.sol",
           "scope": 7079,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 6555,
@@ -7612,9 +7554,7 @@
           "absolutePath": "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol",
           "file": "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol",
           "scope": 7079,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 6556,
@@ -7623,22 +7563,11 @@
       },
       {
         "attributes": {
-          "contractDependencies": [
-            26,
-            736,
-            805,
-            6464
-          ],
+          "contractDependencies": [26, 736, 805, 6464],
           "contractKind": "contract",
           "documentation": "@title DataTokenTemplate\n \n@dev DataTokenTemplate is an ERC20 compliant token template\n     Used by the factory contract as a bytecode reference to \n     deploy new DataTokens.",
           "fullyImplemented": true,
-          "linearizedBaseContracts": [
-            7078,
-            736,
-            805,
-            26,
-            6464
-          ],
+          "linearizedBaseContracts": [7078, 736, 805, 26, 6464],
           "name": "DataTokenTemplate",
           "scope": 7079
         },
@@ -8098,9 +8027,7 @@
                   {
                     "attributes": {
                       "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
+                      "overloadedDeclarations": [null],
                       "referencedDeclaration": 6588,
                       "type": "uint256",
                       "value": "BASE"
@@ -8174,9 +8101,7 @@
                   {
                     "attributes": {
                       "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
+                      "overloadedDeclarations": [null],
                       "referencedDeclaration": 6588,
                       "type": "uint256",
                       "value": "BASE"
@@ -8765,9 +8690,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6641,
@@ -8786,9 +8709,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -8805,10 +8726,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: token instance already initialized\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -8832,9 +8750,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6579,
                                   "type": "bool",
                                   "value": "initialized"
@@ -8899,9 +8815,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6651,
@@ -8920,9 +8834,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -8939,10 +8851,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: invalid minter\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -8981,9 +8890,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 7121,
                                       "type": "msg",
                                       "value": "msg"
@@ -9000,9 +8907,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6581,
                                   "type": "address",
                                   "value": "_minter"
@@ -9064,9 +8969,7 @@
               "implemented": true,
               "isConstructor": true,
               "kind": "constructor",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "",
               "scope": 7078,
               "stateMutability": "nonpayable",
@@ -9241,9 +9144,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6676,
@@ -9262,9 +9163,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "bool",
                           "type_conversion": false
                         },
@@ -9297,9 +9196,7 @@
                                   "typeString": "address"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6798,
                               "type": "function (string memory,string memory,address,uint256,string memory,address) returns (bool)",
                               "value": "_initialize"
@@ -9311,9 +9208,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6664,
                               "type": "string memory",
                               "value": "name"
@@ -9325,9 +9220,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6666,
                               "type": "string memory",
                               "value": "symbol"
@@ -9339,9 +9232,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6668,
                               "type": "address",
                               "value": "minterAddress"
@@ -9353,9 +9244,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6670,
                               "type": "uint256",
                               "value": "cap"
@@ -9367,9 +9256,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6672,
                               "type": "string memory",
                               "value": "blob"
@@ -9381,9 +9268,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6674,
                               "type": "address",
                               "value": "feeCollector"
@@ -9631,9 +9516,7 @@
                   {
                     "attributes": {
                       "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
+                      "overloadedDeclarations": [null],
                       "referencedDeclaration": 6650,
                       "type": "modifier ()",
                       "value": "onlyNotInitialized"
@@ -9662,9 +9545,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "bool",
                           "type_conversion": false
                         },
@@ -9697,9 +9578,7 @@
                                   "typeString": "address"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6798,
                               "type": "function (string memory,string memory,address,uint256,string memory,address) returns (bool)",
                               "value": "_initialize"
@@ -9711,9 +9590,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6689,
                               "type": "string calldata",
                               "value": "name"
@@ -9725,9 +9602,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6691,
                               "type": "string calldata",
                               "value": "symbol"
@@ -9739,9 +9614,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6693,
                               "type": "address",
                               "value": "minterAddress"
@@ -9753,9 +9626,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6695,
                               "type": "uint256",
                               "value": "cap"
@@ -9767,9 +9638,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6697,
                               "type": "string calldata",
                               "value": "blob"
@@ -9781,9 +9650,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6699,
                               "type": "address",
                               "value": "feeCollector"
@@ -9818,9 +9685,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "_initialize",
               "scope": 7078,
               "stateMutability": "nonpayable",
@@ -10038,9 +9903,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -10057,10 +9920,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: Invalid minter,  zero address\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -10087,9 +9947,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6722,
                                   "type": "address",
                                   "value": "minterAddress"
@@ -10106,9 +9964,7 @@
                                   "isPure": true,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "address payable",
                                   "type_conversion": true
                                 },
@@ -10196,9 +10052,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -10215,10 +10069,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: Invalid minter, zero address\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -10245,9 +10096,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6581,
                                   "type": "address",
                                   "value": "_minter"
@@ -10264,9 +10113,7 @@
                                   "isPure": true,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "address payable",
                                   "type_conversion": true
                                 },
@@ -10354,9 +10201,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -10373,10 +10218,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: Invalid community fee collector, zero address\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -10403,9 +10245,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6728,
                                   "type": "address",
                                   "value": "feeCollector"
@@ -10422,9 +10262,7 @@
                                   "isPure": true,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "address payable",
                                   "type_conversion": true
                                 },
@@ -10512,9 +10350,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -10531,10 +10367,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: Invalid cap value\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -10561,9 +10394,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6724,
                                   "type": "uint256",
                                   "value": "cap"
@@ -10637,9 +10468,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6571,
                               "type": "uint256",
                               "value": "_cap"
@@ -10651,9 +10480,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6724,
                               "type": "uint256",
                               "value": "cap"
@@ -10688,9 +10515,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6565,
                               "type": "string storage ref",
                               "value": "_name"
@@ -10702,9 +10527,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6718,
                               "type": "string memory",
                               "value": "name"
@@ -10739,9 +10562,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6569,
                               "type": "string storage ref",
                               "value": "_blob"
@@ -10753,9 +10574,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6726,
                               "type": "string memory",
                               "value": "blob"
@@ -10790,9 +10609,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6567,
                               "type": "string storage ref",
                               "value": "_symbol"
@@ -10804,9 +10621,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6720,
                               "type": "string memory",
                               "value": "symbol"
@@ -10841,9 +10656,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6581,
                               "type": "address",
                               "value": "_minter"
@@ -10855,9 +10668,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6722,
                               "type": "address",
                               "value": "minterAddress"
@@ -10892,9 +10703,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6576,
                               "type": "address",
                               "value": "_communityFeeCollector"
@@ -10906,9 +10715,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6728,
                               "type": "address",
                               "value": "feeCollector"
@@ -10943,9 +10750,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6579,
                               "type": "bool",
                               "value": "initialized"
@@ -10989,9 +10794,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6579,
                           "type": "bool",
                           "value": "initialized"
@@ -11090,9 +10893,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6806,
@@ -11107,9 +10908,7 @@
                   {
                     "attributes": {
                       "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
+                      "overloadedDeclarations": [null],
                       "referencedDeclaration": 6662,
                       "type": "modifier ()",
                       "value": "onlyMinter"
@@ -11135,9 +10934,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -11154,10 +10951,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: cap exceeded\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -11189,9 +10983,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "uint256",
                                   "type_conversion": false
                                 },
@@ -11216,29 +11008,21 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "arguments": [
-                                            null
-                                          ],
+                                          "arguments": [null],
                                           "isConstant": false,
                                           "isLValue": false,
                                           "isPure": false,
                                           "isStructConstructorCall": false,
                                           "lValueRequested": false,
-                                          "names": [
-                                            null
-                                          ],
+                                          "names": [null],
                                           "type": "uint256",
                                           "type_conversion": false
                                         },
                                         "children": [
                                           {
                                             "attributes": {
-                                              "argumentTypes": [
-                                                null
-                                              ],
-                                              "overloadedDeclarations": [
-                                                null
-                                              ],
+                                              "argumentTypes": [null],
+                                              "overloadedDeclarations": [null],
                                               "referencedDeclaration": 363,
                                               "type": "function () view returns (uint256)",
                                               "value": "totalSupply"
@@ -11260,9 +11044,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6802,
                                       "type": "uint256",
                                       "value": "value"
@@ -11279,9 +11061,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6571,
                                   "type": "uint256",
                                   "value": "_cap"
@@ -11332,9 +11112,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -11351,9 +11129,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 620,
                               "type": "function (address,uint256)",
                               "value": "_mint"
@@ -11365,9 +11141,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6800,
                               "type": "address",
                               "value": "account"
@@ -11379,9 +11153,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6802,
                               "type": "uint256",
                               "value": "value"
@@ -11416,9 +11188,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "startOrder",
               "scope": 7078,
               "stateMutability": "nonpayable",
@@ -11541,9 +11311,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6834,
@@ -11554,9 +11322,7 @@
                 "children": [
                   {
                     "attributes": {
-                      "assignments": [
-                        6836
-                      ]
+                      "assignments": [6836]
                     },
                     "children": [
                       {
@@ -11609,9 +11375,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        6840
-                      ]
+                      "assignments": [6840]
                     },
                     "children": [
                       {
@@ -11648,9 +11412,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "uint256",
                           "type_conversion": false
                         },
@@ -11667,9 +11429,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 7077,
                               "type": "function (uint256,uint256) pure returns (uint256)",
                               "value": "calculateFee"
@@ -11681,9 +11441,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6828,
                               "type": "uint256",
                               "value": "amount"
@@ -11695,9 +11453,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6593,
                               "type": "uint256",
                               "value": "BASE_COMMUNITY_FEE_PERCENTAGE"
@@ -11726,9 +11482,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "bool",
                           "type_conversion": false
                         },
@@ -11745,9 +11499,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 394,
                               "type": "function (address,uint256) returns (bool)",
                               "value": "transfer"
@@ -11759,9 +11511,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6576,
                               "type": "address",
                               "value": "_communityFeeCollector"
@@ -11773,9 +11523,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6840,
                               "type": "uint256",
                               "value": "communityFee"
@@ -11817,9 +11565,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6832,
                               "type": "address",
                               "value": "mrktFeeCollector"
@@ -11836,9 +11582,7 @@
                               "isPure": true,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "address payable",
                               "type_conversion": true
                             },
@@ -11907,9 +11651,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6836,
                                       "type": "uint256",
                                       "value": "marketFee"
@@ -11926,9 +11668,7 @@
                                       "isPure": false,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "type": "uint256",
                                       "type_conversion": false
                                     },
@@ -11945,9 +11685,7 @@
                                               "typeString": "uint256"
                                             }
                                           ],
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 7077,
                                           "type": "function (uint256,uint256) pure returns (uint256)",
                                           "value": "calculateFee"
@@ -11959,9 +11697,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 6828,
                                           "type": "uint256",
                                           "value": "amount"
@@ -11973,9 +11709,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 6598,
                                           "type": "uint256",
                                           "value": "BASE_MARKET_FEE_PERCENTAGE"
@@ -12009,9 +11743,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "bool",
                                   "type_conversion": false
                                 },
@@ -12028,9 +11760,7 @@
                                           "typeString": "uint256"
                                         }
                                       ],
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 394,
                                       "type": "function (address,uint256) returns (bool)",
                                       "value": "transfer"
@@ -12042,9 +11772,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6832,
                                       "type": "address",
                                       "value": "mrktFeeCollector"
@@ -12056,9 +11784,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6836,
                                       "type": "uint256",
                                       "value": "marketFee"
@@ -12089,9 +11815,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        6871
-                      ]
+                      "assignments": [6871]
                     },
                     "children": [
                       {
@@ -12128,9 +11852,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "uint256",
                           "type_conversion": false
                         },
@@ -12155,9 +11877,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6840,
                                   "type": "uint256",
                                   "value": "communityFee"
@@ -12174,9 +11894,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6836,
                               "type": "uint256",
                               "value": "marketFee"
@@ -12205,9 +11923,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "bool",
                           "type_conversion": false
                         },
@@ -12224,9 +11940,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 394,
                               "type": "function (address,uint256) returns (bool)",
                               "value": "transfer"
@@ -12238,9 +11952,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6581,
                               "type": "address",
                               "value": "_minter"
@@ -12257,9 +11969,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "uint256",
                               "type_conversion": false
                             },
@@ -12284,9 +11994,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6828,
                                       "type": "uint256",
                                       "value": "amount"
@@ -12303,9 +12011,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6871,
                                   "type": "uint256",
                                   "value": "totalFee"
@@ -12339,9 +12045,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -12378,9 +12082,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6614,
                               "type": "function (address,address,uint256,uint256,uint256,address,uint256)",
                               "value": "OrderStarted"
@@ -12392,9 +12094,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6826,
                               "type": "address",
                               "value": "consumer"
@@ -12418,9 +12118,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7121,
                                   "type": "msg",
                                   "value": "msg"
@@ -12437,9 +12135,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6828,
                               "type": "uint256",
                               "value": "amount"
@@ -12451,9 +12147,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6830,
                               "type": "uint256",
                               "value": "serviceId"
@@ -12477,9 +12171,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7111,
                                   "type": "block",
                                   "value": "block"
@@ -12496,9 +12188,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6832,
                               "type": "address",
                               "value": "mrktFeeCollector"
@@ -12510,9 +12200,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6836,
                               "type": "uint256",
                               "value": "marketFee"
@@ -12547,9 +12235,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "finishOrder",
               "scope": 7078,
               "stateMutability": "nonpayable",
@@ -12671,9 +12357,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6908,
@@ -12705,9 +12389,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6904,
                               "type": "uint256",
                               "value": "amount"
@@ -12748,9 +12430,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "tuple()",
                               "type_conversion": false
                             },
@@ -12767,10 +12447,7 @@
                                       "typeString": "literal_string \"DataTokenTemplate: failed to finish order\""
                                     }
                                   ],
-                                  "overloadedDeclarations": [
-                                    7124,
-                                    7125
-                                  ],
+                                  "overloadedDeclarations": [7124, 7125],
                                   "referencedDeclaration": 7125,
                                   "type": "function (bool,string memory) pure",
                                   "value": "require"
@@ -12787,9 +12464,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "bool",
                                   "type_conversion": false
                                 },
@@ -12806,9 +12481,7 @@
                                           "typeString": "uint256"
                                         }
                                       ],
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 394,
                                       "type": "function (address,uint256) returns (bool)",
                                       "value": "transfer"
@@ -12820,9 +12493,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6902,
                                       "type": "address",
                                       "value": "consumer"
@@ -12834,9 +12505,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 6904,
                                       "type": "uint256",
                                       "value": "amount"
@@ -12892,9 +12561,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -12927,9 +12594,7 @@
                                   "typeString": "uint256"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6628,
                               "type": "function (bytes32,address,uint256,uint256,address,uint256)",
                               "value": "OrderFinished"
@@ -12941,9 +12606,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6900,
                               "type": "bytes32",
                               "value": "orderTxId"
@@ -12955,9 +12618,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6902,
                               "type": "address",
                               "value": "consumer"
@@ -12969,9 +12630,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6904,
                               "type": "uint256",
                               "value": "amount"
@@ -12983,9 +12642,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6906,
                               "type": "uint256",
                               "value": "serviceId"
@@ -13009,9 +12666,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7121,
                                   "type": "msg",
                                   "value": "msg"
@@ -13040,9 +12695,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7111,
                                   "type": "block",
                                   "value": "block"
@@ -13125,9 +12778,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6939,
@@ -13142,9 +12793,7 @@
                   {
                     "attributes": {
                       "argumentTypes": null,
-                      "overloadedDeclarations": [
-                        null
-                      ],
+                      "overloadedDeclarations": [null],
                       "referencedDeclaration": 6662,
                       "type": "modifier ()",
                       "value": "onlyMinter"
@@ -13176,9 +12825,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6583,
                               "type": "address",
                               "value": "_proposedMinter"
@@ -13190,9 +12837,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6935,
                               "type": "address",
                               "value": "newMinter"
@@ -13221,9 +12866,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -13240,9 +12883,7 @@
                                   "typeString": "address"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6634,
                               "type": "function (address,address)",
                               "value": "MinterProposed"
@@ -13266,9 +12907,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7121,
                                   "type": "msg",
                                   "value": "msg"
@@ -13285,9 +12924,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6583,
                               "type": "address",
                               "value": "_proposedMinter"
@@ -13322,9 +12959,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "approveMinter",
               "scope": 7078,
               "stateMutability": "nonpayable",
@@ -13334,9 +12969,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6952,
@@ -13345,9 +12978,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6953,
@@ -13366,9 +12997,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -13385,10 +13014,7 @@
                                   "typeString": "literal_string \"DataTokenTemplate: invalid proposed minter address\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -13427,9 +13053,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 7121,
                                       "type": "msg",
                                       "value": "msg"
@@ -13446,9 +13070,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6583,
                                   "type": "address",
                                   "value": "_proposedMinter"
@@ -13499,9 +13121,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -13518,9 +13138,7 @@
                                   "typeString": "address"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6640,
                               "type": "function (address,address)",
                               "value": "MinterApproved"
@@ -13532,9 +13150,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6581,
                               "type": "address",
                               "value": "_minter"
@@ -13546,9 +13162,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6583,
                               "type": "address",
                               "value": "_proposedMinter"
@@ -13583,9 +13197,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6581,
                               "type": "address",
                               "value": "_minter"
@@ -13597,9 +13209,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6583,
                               "type": "address",
                               "value": "_proposedMinter"
@@ -13634,9 +13244,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6583,
                               "type": "address",
                               "value": "_proposedMinter"
@@ -13653,9 +13261,7 @@
                               "isPure": true,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "address payable",
                               "type_conversion": true
                             },
@@ -13727,9 +13333,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "name",
               "scope": 7078,
               "stateMutability": "view",
@@ -13739,9 +13343,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6979,
@@ -13791,9 +13393,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6565,
                           "type": "string storage ref",
                           "value": "_name"
@@ -13823,9 +13423,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "symbol",
               "scope": 7078,
               "stateMutability": "view",
@@ -13835,9 +13433,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6987,
@@ -13887,9 +13483,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6567,
                           "type": "string storage ref",
                           "value": "_symbol"
@@ -13919,9 +13513,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "blob",
               "scope": 7078,
               "stateMutability": "view",
@@ -13931,9 +13523,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 6995,
@@ -13983,9 +13573,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6569,
                           "type": "string storage ref",
                           "value": "_blob"
@@ -14015,9 +13603,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "decimals",
               "scope": 7078,
               "stateMutability": "view",
@@ -14027,9 +13613,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 7003,
@@ -14079,9 +13663,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6574,
                           "type": "uint8",
                           "value": "_decimals"
@@ -14111,9 +13693,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "cap",
               "scope": 7078,
               "stateMutability": "view",
@@ -14123,9 +13703,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 7011,
@@ -14175,9 +13753,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6571,
                           "type": "uint256",
                           "value": "_cap"
@@ -14207,9 +13783,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "isMinter",
               "scope": 7078,
               "stateMutability": "view",
@@ -14320,9 +13894,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 6581,
                                   "type": "address",
                                   "value": "_minter"
@@ -14334,9 +13906,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7020,
                                   "type": "address",
                                   "value": "account"
@@ -14376,9 +13946,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "minter",
               "scope": 7078,
               "stateMutability": "view",
@@ -14388,9 +13956,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 7032,
@@ -14441,9 +14007,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6581,
                           "type": "address",
                           "value": "_minter"
@@ -14473,9 +14037,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "isInitialized",
               "scope": 7078,
               "stateMutability": "view",
@@ -14485,9 +14047,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 7040,
@@ -14537,9 +14097,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 6579,
                           "type": "bool",
                           "value": "initialized"
@@ -14569,9 +14127,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "calculateFee",
               "scope": 7078,
               "stateMutability": "pure",
@@ -14696,9 +14252,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 7049,
                               "type": "uint256",
                               "value": "amount"
@@ -14784,9 +14338,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 7051,
                               "type": "uint256",
                               "value": "feePercentage"
@@ -14862,9 +14414,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "uint256",
                           "type_conversion": false
                         },
@@ -14894,9 +14444,7 @@
                                   "isPure": false,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "uint256",
                                   "type_conversion": false
                                 },
@@ -14921,9 +14469,7 @@
                                       {
                                         "attributes": {
                                           "argumentTypes": null,
-                                          "overloadedDeclarations": [
-                                            null
-                                          ],
+                                          "overloadedDeclarations": [null],
                                           "referencedDeclaration": 7049,
                                           "type": "uint256",
                                           "value": "amount"
@@ -14940,9 +14486,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 7051,
                                       "type": "uint256",
                                       "value": "feePercentage"
@@ -14964,9 +14508,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6588,
                               "type": "uint256",
                               "value": "BASE"

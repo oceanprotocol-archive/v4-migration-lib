@@ -157,20 +157,14 @@
   "ast": {
     "absolutePath": "project:/contracts/DTFactory.sol",
     "exportedSymbols": {
-      "DTFactory": [
-        964
-      ]
+      "DTFactory": [964]
     },
     "id": 965,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 807,
-        "literals": [
-          "solidity",
-          "0.5",
-          ".7"
-        ],
+        "literals": ["solidity", "0.5", ".7"],
         "nodeType": "PragmaDirective",
         "src": "0:22:5"
       },
@@ -217,17 +211,12 @@
             "src": "651:8:5"
           }
         ],
-        "contractDependencies": [
-          7106
-        ],
+        "contractDependencies": [7106],
         "contractKind": "contract",
         "documentation": "@title DTFactory contract\n@author Ocean Protocol Team\n * @dev Implementation of Ocean DataTokens Factory\n *      DTFactory deploys DataToken proxy contracts.\n     New DataToken proxy contracts are links to the template contract's bytecode.\n     Proxy contract functionality is based on Ocean Protocol custom implementation of ERC1167 standard.",
         "fullyImplemented": true,
         "id": 964,
-        "linearizedBaseContracts": [
-          964,
-          7106
-        ],
+        "linearizedBaseContracts": [964, 7106],
         "name": "DTFactory",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -843,10 +832,7 @@
                       "id": 847,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "1528:7:5",
                       "typeDescriptions": {
@@ -1139,10 +1125,7 @@
                       "id": 884,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "2359:7:5",
                       "typeDescriptions": {
@@ -1375,10 +1358,7 @@
                       "id": 897,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "2499:7:5",
                       "typeDescriptions": {
@@ -1405,9 +1385,7 @@
                   "src": "2499:124:5"
                 },
                 {
-                  "assignments": [
-                    907
-                  ],
+                  "assignments": [907],
                   "declarations": [
                     {
                       "constant": false,
@@ -1694,10 +1672,7 @@
                       "id": 912,
                       "name": "require",
                       "nodeType": "Identifier",
-                      "overloadedDeclarations": [
-                        7124,
-                        7125
-                      ],
+                      "overloadedDeclarations": [7124, 7125],
                       "referencedDeclaration": 7125,
                       "src": "2695:7:5",
                       "typeDescriptions": {
@@ -2347,19 +2322,13 @@
     "attributes": {
       "absolutePath": "project:/contracts/DTFactory.sol",
       "exportedSymbols": {
-        "DTFactory": [
-          964
-        ]
+        "DTFactory": [964]
       }
     },
     "children": [
       {
         "attributes": {
-          "literals": [
-            "solidity",
-            "0.5",
-            ".7"
-          ]
+          "literals": ["solidity", "0.5", ".7"]
         },
         "id": 807,
         "name": "PragmaDirective",
@@ -2371,9 +2340,7 @@
           "absolutePath": "project:/contracts/utils/Deployer.sol",
           "file": "./utils/Deployer.sol",
           "scope": 965,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 808,
@@ -2386,9 +2353,7 @@
           "absolutePath": "project:/contracts/interfaces/IERC20Template.sol",
           "file": "./interfaces/IERC20Template.sol",
           "scope": 965,
-          "symbolAliases": [
-            null
-          ],
+          "symbolAliases": [null],
           "unitAlias": ""
         },
         "id": 809,
@@ -2397,16 +2362,11 @@
       },
       {
         "attributes": {
-          "contractDependencies": [
-            7106
-          ],
+          "contractDependencies": [7106],
           "contractKind": "contract",
           "documentation": "@title DTFactory contract\n@author Ocean Protocol Team\n * @dev Implementation of Ocean DataTokens Factory\n *      DTFactory deploys DataToken proxy contracts.\n     New DataToken proxy contracts are links to the template contract's bytecode.\n     Proxy contract functionality is based on Ocean Protocol custom implementation of ERC1167 standard.",
           "fullyImplemented": true,
-          "linearizedBaseContracts": [
-            964,
-            7106
-          ],
+          "linearizedBaseContracts": [964, 7106],
           "name": "DTFactory",
           "scope": 965
         },
@@ -2819,9 +2779,7 @@
               "implemented": true,
               "isConstructor": true,
               "kind": "constructor",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "",
               "scope": 964,
               "stateMutability": "nonpayable",
@@ -2892,9 +2850,7 @@
               },
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 846,
@@ -2913,9 +2869,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -2932,10 +2886,7 @@
                                   "typeString": "literal_string \"DTFactory: Invalid template token/community fee collector address\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -2977,9 +2928,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 842,
                                       "type": "address",
                                       "value": "_template"
@@ -2996,9 +2945,7 @@
                                       "isPure": true,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "type": "address payable",
                                       "type_conversion": true
                                     },
@@ -3067,9 +3014,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 844,
                                       "type": "address",
                                       "value": "_collector"
@@ -3086,9 +3031,7 @@
                                       "isPure": true,
                                       "isStructConstructorCall": false,
                                       "lValueRequested": false,
-                                      "names": [
-                                        null
-                                      ],
+                                      "names": [null],
                                       "type": "address payable",
                                       "type_conversion": true
                                     },
@@ -3187,9 +3130,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 813,
                               "type": "address",
                               "value": "tokenTemplate"
@@ -3201,9 +3142,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 842,
                               "type": "address",
                               "value": "_template"
@@ -3238,9 +3177,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 815,
                               "type": "address",
                               "value": "communityFeeCollector"
@@ -3252,9 +3189,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 844,
                               "type": "address",
                               "value": "_collector"
@@ -3289,9 +3224,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "createToken",
               "scope": 964,
               "stateMutability": "nonpayable",
@@ -3456,9 +3389,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -3475,10 +3406,7 @@
                                   "typeString": "literal_string \"DTFactory: zero cap is not allowed\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -3505,9 +3433,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 879,
                                   "type": "uint256",
                                   "value": "cap"
@@ -3581,9 +3507,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 882,
                               "type": "address",
                               "value": "token"
@@ -3600,9 +3524,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "address",
                               "type_conversion": false
                             },
@@ -3615,9 +3537,7 @@
                                       "typeString": "address"
                                     }
                                   ],
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7105,
                                   "type": "function (address) returns (address)",
                                   "value": "deploy"
@@ -3629,9 +3549,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 813,
                                   "type": "address",
                                   "value": "tokenTemplate"
@@ -3665,9 +3583,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -3684,10 +3600,7 @@
                                   "typeString": "literal_string \"DTFactory: Failed to perform minimal deploy of a new token\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -3714,9 +3627,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 882,
                                   "type": "address",
                                   "value": "token"
@@ -3733,9 +3644,7 @@
                                   "isPure": true,
                                   "isStructConstructorCall": false,
                                   "lValueRequested": false,
-                                  "names": [
-                                    null
-                                  ],
+                                  "names": [null],
                                   "type": "address payable",
                                   "type_conversion": true
                                 },
@@ -3815,9 +3724,7 @@
                   },
                   {
                     "attributes": {
-                      "assignments": [
-                        907
-                      ]
+                      "assignments": [907]
                     },
                     "children": [
                       {
@@ -3856,9 +3763,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "contract IERC20Template",
                           "type_conversion": true
                         },
@@ -3871,9 +3776,7 @@
                                   "typeString": "address"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 6464,
                               "type": "type(contract IERC20Template)",
                               "value": "IERC20Template"
@@ -3885,9 +3788,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 882,
                               "type": "address",
                               "value": "token"
@@ -3916,9 +3817,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -3935,10 +3834,7 @@
                                   "typeString": "literal_string \"DTFactory: Unable to initialize token instance\""
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                7124,
-                                7125
-                              ],
+                              "overloadedDeclarations": [7124, 7125],
                               "referencedDeclaration": 7125,
                               "type": "function (bool,string memory) pure",
                               "value": "require"
@@ -3955,9 +3851,7 @@
                               "isPure": false,
                               "isStructConstructorCall": false,
                               "lValueRequested": false,
-                              "names": [
-                                null
-                              ],
+                              "names": [null],
                               "type": "bool",
                               "type_conversion": false
                             },
@@ -4002,9 +3896,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 907,
                                       "type": "contract IERC20Template",
                                       "value": "tokenInstance"
@@ -4021,9 +3913,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 875,
                                   "type": "string memory",
                                   "value": "name"
@@ -4035,9 +3925,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 877,
                                   "type": "string memory",
                                   "value": "symbol"
@@ -4061,9 +3949,7 @@
                                   {
                                     "attributes": {
                                       "argumentTypes": null,
-                                      "overloadedDeclarations": [
-                                        null
-                                      ],
+                                      "overloadedDeclarations": [null],
                                       "referencedDeclaration": 7121,
                                       "type": "msg",
                                       "value": "msg"
@@ -4080,9 +3966,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 879,
                                   "type": "uint256",
                                   "value": "cap"
@@ -4094,9 +3978,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 873,
                                   "type": "string memory",
                                   "value": "blob"
@@ -4108,9 +3990,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 815,
                                   "type": "address",
                                   "value": "communityFeeCollector"
@@ -4161,9 +4041,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -4184,9 +4062,7 @@
                                   "typeString": "string memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 826,
                               "type": "function (address,address,string memory)",
                               "value": "TokenCreated"
@@ -4198,9 +4074,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 882,
                               "type": "address",
                               "value": "token"
@@ -4212,9 +4086,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 813,
                               "type": "address",
                               "value": "tokenTemplate"
@@ -4226,9 +4098,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 875,
                               "type": "string memory",
                               "value": "name"
@@ -4257,9 +4127,7 @@
                           "isPure": false,
                           "isStructConstructorCall": false,
                           "lValueRequested": false,
-                          "names": [
-                            null
-                          ],
+                          "names": [null],
                           "type": "tuple()",
                           "type_conversion": false
                         },
@@ -4292,9 +4160,7 @@
                                   "typeString": "string memory"
                                 }
                               ],
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 840,
                               "type": "function (address,string memory,string memory,uint256,address,string memory)",
                               "value": "TokenRegistered"
@@ -4306,9 +4172,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 882,
                               "type": "address",
                               "value": "token"
@@ -4320,9 +4184,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 875,
                               "type": "string memory",
                               "value": "name"
@@ -4334,9 +4196,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 877,
                               "type": "string memory",
                               "value": "symbol"
@@ -4348,9 +4208,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 879,
                               "type": "uint256",
                               "value": "cap"
@@ -4374,9 +4232,7 @@
                               {
                                 "attributes": {
                                   "argumentTypes": null,
-                                  "overloadedDeclarations": [
-                                    null
-                                  ],
+                                  "overloadedDeclarations": [null],
                                   "referencedDeclaration": 7121,
                                   "type": "msg",
                                   "value": "msg"
@@ -4393,9 +4249,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 873,
                               "type": "string memory",
                               "value": "blob"
@@ -4430,9 +4284,7 @@
                           {
                             "attributes": {
                               "argumentTypes": null,
-                              "overloadedDeclarations": [
-                                null
-                              ],
+                              "overloadedDeclarations": [null],
                               "referencedDeclaration": 818,
                               "type": "uint256",
                               "value": "currentTokenCount"
@@ -4484,9 +4336,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "getCurrentTokenCount",
               "scope": 964,
               "stateMutability": "view",
@@ -4496,9 +4346,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 948,
@@ -4548,9 +4396,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 818,
                           "type": "uint256",
                           "value": "currentTokenCount"
@@ -4580,9 +4426,7 @@
               "implemented": true,
               "isConstructor": false,
               "kind": "function",
-              "modifiers": [
-                null
-              ],
+              "modifiers": [null],
               "name": "getTokenTemplate",
               "scope": 964,
               "stateMutability": "view",
@@ -4592,9 +4436,7 @@
             "children": [
               {
                 "attributes": {
-                  "parameters": [
-                    null
-                  ]
+                  "parameters": [null]
                 },
                 "children": [],
                 "id": 956,
@@ -4645,9 +4487,7 @@
                       {
                         "attributes": {
                           "argumentTypes": null,
-                          "overloadedDeclarations": [
-                            null
-                          ],
+                          "overloadedDeclarations": [null],
                           "referencedDeclaration": 813,
                           "type": "address",
                           "value": "tokenTemplate"
