@@ -1,5 +1,6 @@
 {
   "name": "v4-migration-lib",
+  "source": "./src/index.ts",
   "version": "0.0.0",
   "description": "V4 Migration Library",
   "main": "./dist/index.js",
@@ -49,7 +50,7 @@
     "node-abort-controller": "^2.0.0",
     "save-file": "^2.3.1",
     "uuid": "^8.3.2",
-    "web3": "^1.6.1",
+    "web3": "^1.5.2",
     "web3-core": "^1.5.3",
     "web3-eth-contract": "^1.7.0"
   },
@@ -69,6 +70,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.4",
+    "microbundle": "^0.14.2",
     "mocha": "^9.2.0",
     "mock-local-storage": "^1.1.20",
     "prettier": "^2.3.0",
